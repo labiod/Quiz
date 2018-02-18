@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">Quizzes listing</string>
+    <string name="quiz_description_title">Quiz description</string>
+</resources>
