@@ -9,10 +9,11 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import pl.wp.quiz.R;
-import pl.wp.quiz.listener.DataReceiver;
+import pl.wp.quiz.listener.ImageLoadListener;
 import pl.wp.quiz.listener.LoadDataListener;
 import pl.wp.quiz.model.QuizModel;
 import pl.wp.quiz.provider.LoadImageHelper;
@@ -21,7 +22,7 @@ public class QuizDetailsAdapter extends BaseAdapter implements LoadDataListener<
 
     public static final String TAG = QuizDetailsAdapter.class.getSimpleName();
 
-    private class Holder implements DataReceiver {
+    private class Holder implements ImageLoadListener {
         TextView quizTitle;
         TextView quizInfo;
         ImageView quizImage;
@@ -33,8 +34,8 @@ public class QuizDetailsAdapter extends BaseAdapter implements LoadDataListener<
         }
 
         @Override
-        public void onDataDownload(String source) {
-            Log.d(TAG, "onDataDownload: source load");
+        public void onImageLoaded(String source) {
+            Log.d(TAG, "onImageLoaded: source load");
 //            quizImage.setImageDrawable(sourceToDrawable(source));
         }
 
@@ -46,7 +47,11 @@ public class QuizDetailsAdapter extends BaseAdapter implements LoadDataListener<
     private List<QuizModel> mItems;
 
     public QuizDetailsAdapter(List<QuizModel> items) {
-        mItems = items;
+        mItems = items != null ? items : new ArrayList<QuizModel>();
+    }
+
+    public void setQuizzes(List<QuizModel> quizzes) {
+        mItems = quizzes;
     }
     @Override
     public int getCount() {
