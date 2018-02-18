@@ -1,5 +1,7 @@
 package pl.wp.quiz.adapter;
 
+import android.graphics.drawable.Drawable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,10 +12,16 @@ import android.widget.TextView;
 import java.util.List;
 
 import pl.wp.quiz.R;
+import pl.wp.quiz.listener.DataReceiver;
+import pl.wp.quiz.listener.LoadDataListener;
 import pl.wp.quiz.model.QuizModel;
+import pl.wp.quiz.provider.LoadImageHelper;
 
-public class QuizDetailsAdapter extends BaseAdapter {
-    private class Holder {
+public class QuizDetailsAdapter extends BaseAdapter implements LoadDataListener<QuizModel> {
+
+    public static final String TAG = QuizDetailsAdapter.class.getSimpleName();
+
+    private class Holder implements DataReceiver {
         TextView quizTitle;
         TextView quizInfo;
         ImageView quizImage;
@@ -22,6 +30,16 @@ public class QuizDetailsAdapter extends BaseAdapter {
             quizTitle = itemView.findViewById(R.id.quiz_title);
             quizInfo = itemView.findViewById(R.id.quiz_info);
             quizImage = itemView.findViewById(R.id.quiz_image);
+        }
+
+        @Override
+        public void onDataDownload(String source) {
+            Log.d(TAG, "onDataDownload: source load");
+//            quizImage.setImageDrawable(sourceToDrawable(source));
+        }
+
+        private Drawable sourceToDrawable(String source) {
+            return null;
         }
     }
 
@@ -59,10 +77,17 @@ public class QuizDetailsAdapter extends BaseAdapter {
         QuizModel model = getItem(position);
         holder.quizTitle.setText(model.getQuizTitle());
         holder.quizInfo.setText(createInfoForQuiz(model));
+        LoadImageHelper.downloadImage(holder, model.getQuizImageURI());
         return convertView;
     }
 
+    @Override
+    public void onLoadData(List<QuizModel> dataList) {
+        mItems = dataList;
+        notifyDataSetChanged();
+    }
+
     private String createInfoForQuiz(QuizModel model) {
-        return model.getQuizInfo();
+        return model.getLastResultInfo();
     }
 }

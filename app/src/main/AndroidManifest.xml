@@ -21,7 +21,8 @@
             android:name=".provider.QuizProvider"
             android:authorities="pl.wp.quiz.provider"
             android:enabled="true"
-            android:exported="true"></provider>
+            android:exported="true" />
+
     </application>
 
 </manifest>
