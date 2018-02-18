@@ -1,6 +1,10 @@
 package pl.wp.quiz.provider;
 
+import android.net.Uri;
+
 public class QuizContract {
+
+    public static final Uri CONTENT_URI = Uri.parse("content://pl.wp.quiz.provider");
 
     public static class Quizzes {
         public static final String TABLE_NAME = "quizzes";

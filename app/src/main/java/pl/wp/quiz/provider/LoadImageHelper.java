@@ -1,13 +1,9 @@
 package pl.wp.quiz.provider;
 
-import android.os.AsyncTask;
-import android.widget.ImageView;
-
-import pl.wp.quiz.listener.DataReceiver;
-import pl.wp.quiz.model.QuizModel;
+import pl.wp.quiz.listener.ImageLoadListener;
 
 public class LoadImageHelper {
-    public static void downloadImage(DataReceiver receiver, String sourceURI) {
-        receiver.onDataDownload(sourceURI);
+    public static void downloadImage(ImageLoadListener receiver, String sourceURI) {
+        receiver.onImageLoaded(sourceURI);
     }
 }
