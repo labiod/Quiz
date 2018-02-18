@@ -8,6 +8,7 @@ import android.widget.ListView;
 import java.util.Arrays;
 
 import pl.wp.quiz.adapter.QuizDetailsAdapter;
+import pl.wp.quiz.model.QuizModel;
 
 public class QuizActivity extends Activity {
 
@@ -20,7 +21,6 @@ public class QuizActivity extends Activity {
     }
 
     private ListAdapter createQuizDataAdapter() {
-        String[] quizzesTmpList = new String[] {"Quiz1", "Quiz2", "Quiz3", "Quiz4", "Quiz5", "Quiz6", "Quiz7", "Quiz8", "Quiz9", "Quiz10" };
-        return new QuizDetailsAdapter(Arrays.asList(quizzesTmpList));
+        return new QuizDetailsAdapter(QuizModel.generateModels(10));
     }
 }

@@ -5,9 +5,9 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.net.Uri;
 
+import pl.wp.quiz.provider.database.QuizeesDBHelper;
+
 public class QuizProvider extends ContentProvider {
-    public QuizProvider() {
-    }
 
     @Override
     public int delete(Uri uri, String selection, String[] selectionArgs) {
@@ -37,8 +37,19 @@ public class QuizProvider extends ContentProvider {
     @Override
     public Cursor query(Uri uri, String[] projection, String selection,
                         String[] selectionArgs, String sortOrder) {
-        // TODO: Implement this to handle query requests from clients.
-        throw new UnsupportedOperationException("Not yet implemented");
+        // TODO: Implement basically for now. Retreive data only from quiz.
+
+        QuizeesDBHelper dbHelper = new QuizeesDBHelper(getContext());
+        String table;
+        switch (uri.getLastPathSegment()) {
+            case QuizContract.QuizQuestions.TABLE_NAME:
+                table = QuizContract.QuizQuestions.TABLE_NAME;
+                break;
+            default:
+                table = QuizContract.Quizzes.TABLE_NAME;
+        }
+        return dbHelper.getReadableDatabase().query(table, projection, selection, selectionArgs, null, null, sortOrder);
+
     }
 
     @Override
