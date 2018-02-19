@@ -30,7 +30,10 @@ public class QuizModel {
 
     public QuizModel(Cursor cursor) {
         mQuizTitle = cursor.getString(cursor.getColumnIndex(Quizzes.QUIZ_TITLE));
+<<<<<<< HEAD
         mLastResultInfo = cursor.getString(cursor.getColumnIndex(Quizzes.QUIZ_CONTENT));
+=======
+>>>>>>> master
         mQuizImageURI = cursor.getString(cursor.getColumnIndex(Quizzes.QUIZ_PHOTO_URI));
         mQuestionNumber = cursor.getInt(cursor.getColumnIndex(Quizzes.QUESTION_NUMBER));
         mQuizCategory = cursor.getString(cursor.getColumnIndex(Quizzes.QUIZ_CATEGORY));
@@ -42,13 +45,18 @@ public class QuizModel {
     }
 
     public String getLastResultInfo() {
+<<<<<<< HEAD
         return mLastResultInfo;
+=======
+        return mLastResultInfo == null ? "Brak rozwiązania" : mLastResultInfo;
+>>>>>>> master
     }
 
     public String getQuizTitle() {
         return mQuizTitle;
     }
 
+<<<<<<< HEAD
     public static List<QuizModel> generateModels(int size) {
         List<QuizModel> result = new ArrayList<>();
         for (int i = 0; i < size; ++i) {
@@ -57,6 +65,8 @@ public class QuizModel {
         return result;
     }
 
+=======
+>>>>>>> master
     public String getQuizCategory() {
         return mQuizCategory;
     }
