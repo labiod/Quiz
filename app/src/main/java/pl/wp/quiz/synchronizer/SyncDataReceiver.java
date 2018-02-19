@@ -24,8 +24,8 @@ public class SyncDataReceiver extends BroadcastReceiver {
         PendingIntent sender = PendingIntent.getBroadcast(context, SYNCHRONIZED_DATA_WITH_SERVICE, i, 0);
 
         long firstTime = SystemClock.elapsedRealtime();
-        firstTime += 60 * 1000;//start after 1 minutes.
-        long repeatTime = 60 * 5 * 1000; //repeat after 5 minutes
+        firstTime += 60 * 1000;// start after 1 minutes.
+        long repeatTime = 60 * 15 * 1000; //repeat after 15 minutes
 
         // Schedule the alarm!
         AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);

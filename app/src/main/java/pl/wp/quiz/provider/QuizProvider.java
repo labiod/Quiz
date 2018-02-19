@@ -16,7 +16,8 @@ public class QuizProvider extends ContentProvider {
     @Override
     public int delete(Uri uri, String selection, String[] selectionArgs) {
         // Implement this to handle requests to delete one or more rows.
-        throw new UnsupportedOperationException("Not yet implemented");
+        String table = uri.getLastPathSegment();
+        return mDbHelper.getWritableDatabase().delete(table, selection, selectionArgs);
     }
 
     @Override
@@ -28,14 +29,7 @@ public class QuizProvider extends ContentProvider {
 
     @Override
     public Uri insert(Uri uri, ContentValues values) {
-        String table;
-        switch (uri.getLastPathSegment()) {
-            case QuizContract.QuizQuestions.TABLE_NAME:
-                table = QuizContract.QuizQuestions.TABLE_NAME;
-                break;
-            default:
-                table = QuizContract.Quizzes.TABLE_NAME;
-        }
+        String table = uri.getLastPathSegment();
         long id = mDbHelper.getWritableDatabase().insert(table, null, values);
         return Uri.withAppendedPath(QuizContract.CONTENT_URI, "/" + id);
     }
@@ -49,31 +43,24 @@ public class QuizProvider extends ContentProvider {
     @Override
     public Cursor query(Uri uri, String[] projection, String selection,
                         String[] selectionArgs, String sortOrder) {
-        // TODO: Implement basically for now. Retreive data only from quiz.
 
-        String table;
-        switch (uri.getLastPathSegment()) {
-            case QuizContract.QuizQuestions.TABLE_NAME:
-                table = QuizContract.QuizQuestions.TABLE_NAME;
-                break;
-            default:
-                table = QuizContract.Quizzes.TABLE_NAME;
-        }
-        return mDbHelper.getReadableDatabase().query(table, projection, selection, selectionArgs, null, null, sortOrder);
+        String table = uri.getLastPathSegment();
+        return mDbHelper.getReadableDatabase().query(
+                table,
+                projection,
+                selection,
+                selectionArgs,
+                null,
+                null,
+                sortOrder
+        );
 
     }
 
     @Override
     public int update(Uri uri, ContentValues values, String selection,
                       String[] selectionArgs) {
-        String table;
-        switch (uri.getLastPathSegment()) {
-            case QuizContract.QuizQuestions.TABLE_NAME:
-                table = QuizContract.QuizQuestions.TABLE_NAME;
-                break;
-            default:
-                table = QuizContract.Quizzes.TABLE_NAME;
-        }
+        String table = uri.getLastPathSegment();
         return mDbHelper.getWritableDatabase().update(table, values, selection, selectionArgs);
     }
 }
