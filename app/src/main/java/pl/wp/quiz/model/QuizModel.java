@@ -5,33 +5,36 @@ import android.database.Cursor;
 import java.util.ArrayList;
 import java.util.List;
 
+import static pl.wp.quiz.provider.QuizContract.*;
+
 public class QuizModel {
     private int mQuestionNumber;
-    private String mQuizTest;
+    private String mQuizTitle;
     private String mLastResultInfo;
     private String mQuizImageURI;
-    private boolean mFinished;
+    private String mQuizCategory;
+    private long mCreatedDate;
 
     /**
      * Constructor used only for mockup
-     * @param quizTest - name of current quiz
+     * @param quizTitle - name of current quiz
      * @param lastResultInfo - info about
      * @param quizImageURI - quiz image url
      * @param finished - true if last result is finished, false otherwise
      */
-    public QuizModel(String quizTest, String lastResultInfo, String quizImageURI, boolean finished) {
-        mQuizTest = quizTest;
+    public QuizModel(String quizTitle, String lastResultInfo, String quizImageURI, boolean finished) {
+        mQuizTitle = quizTitle;
         mLastResultInfo = lastResultInfo;
         mQuizImageURI = quizImageURI;
-        mFinished = finished;
     }
 
     public QuizModel(Cursor cursor) {
-
-    }
-
-    public boolean isFinished() {
-        return mFinished;
+        mQuizTitle = cursor.getString(cursor.getColumnIndex(Quizzes.QUIZ_TITLE));
+        mLastResultInfo = cursor.getString(cursor.getColumnIndex(Quizzes.QUIZ_CONTENT));
+        mQuizImageURI = cursor.getString(cursor.getColumnIndex(Quizzes.QUIZ_PHOTO_URI));
+        mQuestionNumber = cursor.getInt(cursor.getColumnIndex(Quizzes.QUESTION_NUMBER));
+        mQuizCategory = cursor.getString(cursor.getColumnIndex(Quizzes.QUIZ_CATEGORY));
+        mCreatedDate = cursor.getLong(cursor.getColumnIndex(Quizzes.QUIZ_CATEGORY));
     }
 
     public String getQuizImageURI() {
@@ -43,7 +46,7 @@ public class QuizModel {
     }
 
     public String getQuizTitle() {
-        return mQuizTest;
+        return mQuizTitle;
     }
 
     public static List<QuizModel> generateModels(int size) {
@@ -52,5 +55,17 @@ public class QuizModel {
             result.add(new QuizModel("Test" + i, "Ostatni wynik 8/10 80%", "", true));
         }
         return result;
+    }
+
+    public String getQuizCategory() {
+        return mQuizCategory;
+    }
+
+    public long getCreatedDate() {
+        return mCreatedDate;
+    }
+
+    public int getQuestionNumber() {
+        return mQuestionNumber;
     }
 }

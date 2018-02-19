@@ -23,22 +23,18 @@ public class QuizeesDBHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.beginTransaction();
         db.execSQL(QuizContract.Quizzes.CREATE);
         db.execSQL(QuizContract.QuizQuestions.CREATE);
         db.execSQL(QuizContract.QuestionAnswers.CREATE);
         db.execSQL(QuizContract.UsersAnswers.CREATE);
-        db.endTransaction();
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.beginTransaction();
         db.execSQL(QuizContract.Quizzes.DELETE);
         db.execSQL(QuizContract.QuizQuestions.DELETE);
         db.execSQL(QuizContract.QuestionAnswers.DELETE);
         db.execSQL(QuizContract.UsersAnswers.DELETE);
-        db.endTransaction();
         onCreate(db);
 
     }
