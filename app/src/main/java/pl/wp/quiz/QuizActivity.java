@@ -7,21 +7,21 @@ import android.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.ContactsContract;
-import android.widget.ListAdapter;
+import android.util.Log;
 import android.widget.ListView;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import pl.wp.quiz.adapter.QuizDetailsAdapter;
 import pl.wp.quiz.model.QuizModel;
 import pl.wp.quiz.provider.QuizContract;
+import pl.wp.quiz.synchronizer.SyncDataReceiver;
 
 public class QuizActivity extends Activity implements LoaderManager.LoaderCallbacks<Cursor> {
 
     public static final int QUIZZES_LOAD = 1;
+    public static final String TAG = QuizActivity.class.getSimpleName();
     private QuizDetailsAdapter mQuizDetailsAdapter;
 
     @Override
@@ -32,6 +32,7 @@ public class QuizActivity extends Activity implements LoaderManager.LoaderCallba
         mQuizDetailsAdapter = new QuizDetailsAdapter(null);
         quizzesList.setAdapter(mQuizDetailsAdapter);
         loadQuizzes();
+        SyncDataReceiver.startDataSynchronize(this);
     }
 
     private void loadQuizzes() {
@@ -58,9 +59,11 @@ public class QuizActivity extends Activity implements LoaderManager.LoaderCallba
     private List<QuizModel> reteiveQuizzesForCursor(Cursor data) {
         List<QuizModel> result = new ArrayList<>();
         if (data != null) {
+            Log.d(TAG, "retreiveQuizzesForCursor: cursor count = " + data.getCount());
             if (data.moveToFirst()) {
                 do {
                     QuizModel model = new QuizModel(data);
+                    result.add(model);
                 } while(data.moveToNext());
             }
             data.close();
