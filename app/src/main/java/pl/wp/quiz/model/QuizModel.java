@@ -30,7 +30,6 @@ public class QuizModel {
 
     public QuizModel(Cursor cursor) {
         mQuizTitle = cursor.getString(cursor.getColumnIndex(Quizzes.QUIZ_TITLE));
-        mLastResultInfo = cursor.getString(cursor.getColumnIndex(Quizzes.QUIZ_CONTENT));
         mQuizImageURI = cursor.getString(cursor.getColumnIndex(Quizzes.QUIZ_PHOTO_URI));
         mQuestionNumber = cursor.getInt(cursor.getColumnIndex(Quizzes.QUESTION_NUMBER));
         mQuizCategory = cursor.getString(cursor.getColumnIndex(Quizzes.QUIZ_CATEGORY));
@@ -42,19 +41,11 @@ public class QuizModel {
     }
 
     public String getLastResultInfo() {
-        return mLastResultInfo;
+        return mLastResultInfo == null ? "Brak rozwiązania" : mLastResultInfo;
     }
 
     public String getQuizTitle() {
         return mQuizTitle;
-    }
-
-    public static List<QuizModel> generateModels(int size) {
-        List<QuizModel> result = new ArrayList<>();
-        for (int i = 0; i < size; ++i) {
-            result.add(new QuizModel("Test" + i, "Ostatni wynik 8/10 80%", "", true));
-        }
-        return result;
     }
 
     public String getQuizCategory() {

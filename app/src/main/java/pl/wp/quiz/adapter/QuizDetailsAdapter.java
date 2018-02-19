@@ -14,11 +14,10 @@ import java.util.List;
 
 import pl.wp.quiz.R;
 import pl.wp.quiz.listener.ImageLoadListener;
-import pl.wp.quiz.listener.LoadDataListener;
 import pl.wp.quiz.model.QuizModel;
 import pl.wp.quiz.provider.LoadImageHelper;
 
-public class QuizDetailsAdapter extends BaseAdapter implements LoadDataListener<QuizModel> {
+public class QuizDetailsAdapter extends BaseAdapter {
 
     public static final String TAG = QuizDetailsAdapter.class.getSimpleName();
 
@@ -84,12 +83,6 @@ public class QuizDetailsAdapter extends BaseAdapter implements LoadDataListener<
         holder.quizInfo.setText(createInfoForQuiz(model));
         LoadImageHelper.downloadImage(holder, model.getQuizImageURI());
         return convertView;
-    }
-
-    @Override
-    public void onLoadData(List<QuizModel> dataList) {
-        mItems = dataList;
-        notifyDataSetChanged();
     }
 
     private String createInfoForQuiz(QuizModel model) {
