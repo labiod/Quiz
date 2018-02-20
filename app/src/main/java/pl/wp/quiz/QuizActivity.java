@@ -8,16 +8,18 @@ import android.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.view.View;
 
 import pl.wp.quiz.fragment.QuizBaseFragment;
 import pl.wp.quiz.fragment.QuizDetailsFragment;
 import pl.wp.quiz.fragment.QuizListFragment;
 import pl.wp.quiz.fragment.QuizProgressFragment;
-import pl.wp.quiz.fragment.LoadingDataFragment;
-import pl.wp.quiz.model.QuizModel;
+import pl.wp.quiz.listener.LoadDataListener;
 import pl.wp.quiz.provider.QuizContract;
+import pl.wp.quiz.synchronizer.SyncDataReceiver;
 
-public class QuizActivity extends Activity implements LoaderManager.LoaderCallbacks<Cursor> {
+public class QuizActivity extends Activity implements LoaderManager.LoaderCallbacks<Cursor>, QuizApplication.OnDatabaseSynchronizedListener, LoadDataListener<Cursor> {
 
     public static final String TAG = QuizActivity.class.getSimpleName();
     public static final String QUIZ_ID = "quiz_id";
@@ -33,18 +35,20 @@ public class QuizActivity extends Activity implements LoaderManager.LoaderCallba
     public static final String QUIZ_MODEL = "QUIZ_MODEL";
 
     private QuizBaseFragment mCurrentFragment;
-
+    private final Handler mHandler = new Handler();
+    private String mFragmentToLoad;
+    private View mProgressView;
+    private Bundle mFragmentArgs;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.quiz_main);
-        LoadingDataFragment loadingDataFragment = new LoadingDataFragment();
-        Bundle arguments = new Bundle();
-        arguments.putInt(LoadingDataFragment.LOADER_TYPE, CHECK_DATA);
-        arguments.putString(LoadingDataFragment.FRAGMENT_TO_LOAD, QUIZ_LIST_FRAGMENT_TAG);
-        loadingDataFragment.setArguments(arguments);
-        getFragmentManager().beginTransaction().add(R.id.container, loadingDataFragment).commit();
+        mProgressView = findViewById(R.id.sync_data_progress);
+        mProgressView.setVisibility(View.VISIBLE);
+        mFragmentToLoad = QUIZ_LIST_FRAGMENT_TAG;
+        mFragmentArgs = new Bundle();
+        loadQuizzes(QUIZZES_LOAD, null);
     }
 
     public void loadQuizzes(int loaderId, Bundle args) {
@@ -97,7 +101,11 @@ public class QuizActivity extends Activity implements LoaderManager.LoaderCallba
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        mCurrentFragment.onLoadData(data);
+        if (mCurrentFragment != null) {
+            mCurrentFragment.onLoadData(data);
+        } else {
+            onLoadData(data);
+        }
 
     }
 
@@ -112,6 +120,27 @@ public class QuizActivity extends Activity implements LoaderManager.LoaderCallba
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
 
+    }
+
+    @Override
+    public void onLoadData(Cursor dataList) {
+        if (dataList == null || dataList.getCount() == 0) {
+            SyncDataReceiver.startDataSynchronize(this, this);
+        } else {
+            mHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    loadFragmentByName(mFragmentToLoad, mFragmentArgs);
+                    mProgressView.setVisibility(View.GONE);
+                }
+            });
+        }
+    }
+
+    @Override
+    public void onDatabaseSynchronized() {
+        loadFragmentByName(mFragmentToLoad, mFragmentArgs);
+        mProgressView.setVisibility(View.GONE);
     }
 
     public void loadQuizProgressFragment(long quizId, int quizProgress) {
