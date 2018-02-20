@@ -5,6 +5,7 @@ import android.net.Uri;
 public class QuizContract {
 
     public static final Uri CONTENT_URI = Uri.parse("content://pl.wp.quiz.provider");
+    public static final String QUESTION_WITH_ANSWER = "question_with_answer";
 
     public static class Quizzes {
         public static final String TABLE_NAME = "quizzes";
@@ -79,6 +80,36 @@ public class QuizContract {
                 ID + " INTEGER PRIMARY KEY," +
                 ANSWER_ID + " INTEGER," +
                 ANSWER_DATE + " INTEGER)";
+        public static final String DELETE = "DROP TABLE IF EXISTS " + TABLE_NAME;
+    }
+
+    public static class QuizRates {
+        public static final String TABLE_NAME = "quiz_rates";
+        public static final String ID_RATE = "id_rate";
+        public static final String QUIZ_ID = "quiz_id";
+        public static final String RATE_FROM = "rate_from";
+        public static final String RATE_TO = "rate_to";
+        public static final String RATE_CONTENT = "rate_content";
+
+        public static final String CREATE = "CREATE TABLE " + TABLE_NAME + "(" +
+                ID_RATE + " INTEGER PRIMARY KEY," +
+                QUIZ_ID + " INTEGER ," +
+                RATE_FROM + " INTEGER ," +
+                RATE_TO + " INTEGER ," +
+                RATE_CONTENT + " TEXT)";
+        public static final String DELETE = "DROP TABLE IF EXISTS " + TABLE_NAME;
+    }
+
+    public static class Config {
+        public static final String TABLE_NAME = "sync_config";
+        public static final String ID_CONFIG = "id_config";
+        public static final String SYNC_DATE = "sync_date";
+        public static final String SYNC_STATUS = "sync_status";
+
+        public static final String CREATE = "CREATE TABLE " + TABLE_NAME + "(" +
+                ID_CONFIG + " INTEGER PRIMARY KEY," +
+                SYNC_DATE + " INTEGER ," +
+                SYNC_STATUS + " INTEGER)";
         public static final String DELETE = "DROP TABLE IF EXISTS " + TABLE_NAME;
     }
 

@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <dimen name="quiz_title_text_size">24sp</dimen>
+    <dimen name="quiz_normal_text_size">16sp</dimen>
+    <dimen name="quiz_result_text_size">30sp</dimen>
 </resources>

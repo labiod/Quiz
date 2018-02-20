@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">Quizzes listing</string>
     <string name="quiz_description_title">Quiz description</string>
+    <string name="answer_on_question">Odpowiedziałeś na:</string>
 </resources>

@@ -72,7 +72,7 @@ public class QuizDetailsAdapter extends BaseAdapter {
         Holder holder;
         if (convertView == null) {
             LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-            convertView = inflater.inflate(R.layout.quiz_details, parent, false);
+            convertView = inflater.inflate(R.layout.quiz_list_item, parent, false);
             holder = new Holder(convertView);
             convertView.setTag(holder);
         } else {
