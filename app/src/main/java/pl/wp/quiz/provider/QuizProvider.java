@@ -7,7 +7,8 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.util.Log;
 
-import pl.wp.quiz.provider.database.QuizeesDBHelper;
+import pl.wp.quiz.provider.database.QuizContract;
+import pl.wp.quiz.provider.database.QuizzesDBHelper;
 
 public class QuizProvider extends ContentProvider {
     private static final UriMatcher sUriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
@@ -19,12 +20,13 @@ public class QuizProvider extends ContentProvider {
         sUriMatcher.addURI("pl.wp.quiz.provider", QuizContract.QuizQuestions.TABLE_NAME, 2);
         sUriMatcher.addURI("pl.wp.quiz.provider", QuizContract.QuestionAnswers.TABLE_NAME, 3);
         sUriMatcher.addURI("pl.wp.quiz.provider", QuizContract.UsersAnswers.TABLE_NAME, 4);
+        sUriMatcher.addURI("pl.wp.quiz.provider", QuizContract.QuizRates.TABLE_NAME, 5);
 
-        sUriMatcher.addURI("pl.wp.quiz.provider", QuizContract.Quizzes.TABLE_NAME + "/#", 5);
-        sUriMatcher.addURI("pl.wp.quiz.provider", QuizContract.QUESTION_WITH_ANSWER, 6);
+        sUriMatcher.addURI("pl.wp.quiz.provider", QuizContract.Quizzes.TABLE_NAME + "/#", 6);
+        sUriMatcher.addURI("pl.wp.quiz.provider", QuizContract.QUESTION_WITH_ANSWER, 7);
     }
 
-    private QuizeesDBHelper mDbHelper;
+    private QuizzesDBHelper mDbHelper;
 
 
     @Override
@@ -50,7 +52,7 @@ public class QuizProvider extends ContentProvider {
 
     @Override
     public boolean onCreate() {
-        mDbHelper = new QuizeesDBHelper(getContext());
+        mDbHelper = new QuizzesDBHelper(getContext());
         return true;
     }
 
@@ -62,6 +64,7 @@ public class QuizProvider extends ContentProvider {
             case 2:
             case 3:
             case 4:
+            case 5:
                 String table = uri.getLastPathSegment();
                 return mDbHelper.getReadableDatabase().query(
                         table,
@@ -71,22 +74,28 @@ public class QuizProvider extends ContentProvider {
                         null,
                         null,
                         sortOrder);
-            case 5:
+            case 6:
                 String id = uri.getLastPathSegment();
                 Log.d(TAG, "query: id: " + id);
-                String query = "SELECT COUNT(" + QuizContract.UsersAnswers.ID + ") correct_answer, " + QuizContract.Quizzes.QUESTION_NUMBER + " " +
+                String query = "SELECT " + QuizContract.UsersAnswers.ANSWERS_LIST +
+                        ", " + QuizContract.Quizzes.QUESTION_NUMBER + " " +
                         "FROM " + QuizContract.UsersAnswers.TABLE_NAME + " uq " +
-                        "INNER JOIN " + QuizContract.QuestionAnswers.TABLE_NAME + " qa " +
-                        "INNER JOIN " + QuizContract.QuizQuestions.TABLE_NAME + " qq " +
                         "INNER JOIN " + QuizContract.Quizzes.TABLE_NAME + " q " +
-                        "WHERE " + QuizContract.QuizQuestions.QUIZ_ID + " = " + id + " AND " +
-                        QuizContract.QuestionAnswers.IS_CORRECT + " = 1";
+                        "ON uq." + QuizContract.UsersAnswers.QUIZ_ID + " = q." + QuizContract.Quizzes.ID_QUIZ +  " " +
+                        "WHERE uq." + QuizContract.QuizQuestions.QUIZ_ID + " = " + id;
+                Log.d(TAG, "query: " + query);
                 return mDbHelper.getReadableDatabase().rawQuery(query, null);
-            case 6:
+            case 7:
                 String qQuery = "SELECT * FROM " + QuizContract.QuizQuestions.TABLE_NAME + " qq " +
                         "INNER JOIN " + QuizContract.QuestionAnswers.TABLE_NAME + " qa " +
-                        "WHERE qq.id_question = qa.question_id AND (" + selection + " )" +
-                        " ORDER BY " + sortOrder;
+                        "WHERE qq.id_question = qa.question_id";
+                if (selection != null && !selection.trim().isEmpty()) {
+                    qQuery += " AND (" + selection + " )";
+                }
+                if (sortOrder != null && !sortOrder.trim().isEmpty()) {
+                    qQuery += " ORDER BY " + sortOrder;
+                }
+                Log.d(TAG, "query: " + qQuery);
                 return mDbHelper.getReadableDatabase().rawQuery(qQuery, null);
             default:
                 return null;

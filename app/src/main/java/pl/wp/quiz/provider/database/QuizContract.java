@@ -1,4 +1,4 @@
-package pl.wp.quiz.provider;
+package pl.wp.quiz.provider.database;
 
 import android.net.Uri;
 
@@ -71,14 +71,19 @@ public class QuizContract {
     }
 
     public static class UsersAnswers {
+        public static final String ANSWER_SEPARATOR = ";";
         public static final String TABLE_NAME = "users_answers";
-        public static final String ID = "";
-        public static final String ANSWER_ID = "answer_id";
+        public static final String ID = "_id";
+        public static final String QUIZ_ID = "quiz_id";
+        public static final String RATE_ID = "rate_id";
+        public static final String ANSWERS_LIST = "answers_list";
         public static final String ANSWER_DATE = "answer_date";
 
         public static final String CREATE = "CREATE TABLE " + TABLE_NAME + "(" +
                 ID + " INTEGER PRIMARY KEY," +
-                ANSWER_ID + " INTEGER," +
+                QUIZ_ID + " INTEGER," +
+                ANSWERS_LIST + " INTEGER," +
+                RATE_ID + " INTEGER," +
                 ANSWER_DATE + " INTEGER)";
         public static final String DELETE = "DROP TABLE IF EXISTS " + TABLE_NAME;
     }

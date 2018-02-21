@@ -4,10 +4,7 @@ import android.database.Cursor;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import static pl.wp.quiz.provider.QuizContract.*;
+import static pl.wp.quiz.provider.database.QuizContract.*;
 
 public class QuizModel implements Parcelable {
     public static final Creator<QuizModel> CREATOR = new Creator<QuizModel>() {

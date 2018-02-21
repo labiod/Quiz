@@ -14,6 +14,7 @@ public class QuizApplication extends Application {
     private WeakReference<OnDatabaseSynchronizedListener> mDatabaseSynchronizedListener;
     public interface OnDatabaseSynchronizedListener {
         void onDatabaseSynchronized();
+        void onDatabaseSyncProgress(int progress);
     }
 
     public void registerOnDatabaseUpdateListener(OnDatabaseSynchronizedListener listener) {
@@ -26,6 +27,16 @@ public class QuizApplication extends Application {
             OnDatabaseSynchronizedListener listener = mDatabaseSynchronizedListener.get();
             if (listener != null) {
                 listener.onDatabaseSynchronized();
+            }
+        }
+    }
+
+    public void databaseSyncProgress(int progress) {
+
+        if (mDatabaseSynchronizedListener != null) {
+            OnDatabaseSynchronizedListener listener = mDatabaseSynchronizedListener.get();
+            if (listener != null) {
+                listener.onDatabaseSyncProgress(progress);
             }
         }
     }

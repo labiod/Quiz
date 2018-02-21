@@ -1,5 +1,8 @@
 <resources>
     <string name="app_name">Quizzes listing</string>
     <string name="quiz_description_title">Quiz description</string>
-    <string name="answer_on_question">Odpowiedziałeś na:</string>
+    <string name="answer_on_question">You answer at: %i questions</string>
+    <string name="db_test_text">DB test</string>
+    <string name="back_to_quizzes_list_text">Back to quizzes list</string>
+    <string name="repeat_quiz">Repeat quiz</string>
 </resources>

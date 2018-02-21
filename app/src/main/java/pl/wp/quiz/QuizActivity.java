@@ -3,20 +3,27 @@ package pl.wp.quiz;
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.LoaderManager;
+import android.content.ContentValues;
 import android.content.CursorLoader;
+import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.ProgressBar;
 
 import pl.wp.quiz.fragment.QuizBaseFragment;
 import pl.wp.quiz.fragment.QuizDetailsFragment;
 import pl.wp.quiz.fragment.QuizListFragment;
 import pl.wp.quiz.fragment.QuizProgressFragment;
 import pl.wp.quiz.listener.LoadDataListener;
-import pl.wp.quiz.provider.QuizContract;
+import pl.wp.quiz.model.UserAnswers;
+import pl.wp.quiz.provider.database.QuizContract;
 import pl.wp.quiz.synchronizer.SyncDataReceiver;
 
 public class QuizActivity extends Activity implements LoaderManager.LoaderCallbacks<Cursor>, QuizApplication.OnDatabaseSynchronizedListener, LoadDataListener<Cursor> {
@@ -33,17 +40,22 @@ public class QuizActivity extends Activity implements LoaderManager.LoaderCallba
     public static final String QUIZ_DETAILS_FRAGMENT_TAG = "quiz_details_fragment_tag";
     public static final String QUIZ_PROGRESS_FRAGMENT_TAG = "quiz_progress_fragment_tag";
     public static final String QUIZ_MODEL = "QUIZ_MODEL";
+    public static final String USER_ANSWERS = "user_answers";
 
     private QuizBaseFragment mCurrentFragment;
     private final Handler mHandler = new Handler();
     private String mFragmentToLoad;
-    private View mProgressView;
+    private ProgressBar mProgressView;
     private Bundle mFragmentArgs;
+    private View mContainer;
+    private View mLoadingView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.quiz_main);
+        mContainer = findViewById(R.id.container);
+        mLoadingView = findViewById(R.id.loading_progress);
         mProgressView = findViewById(R.id.sync_data_progress);
         mProgressView.setVisibility(View.VISIBLE);
         mFragmentToLoad = QUIZ_LIST_FRAGMENT_TAG;
@@ -57,6 +69,35 @@ public class QuizActivity extends Activity implements LoaderManager.LoaderCallba
         } else {
             getLoaderManager().restartLoader(loaderId, args, this);
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (mCurrentFragment != null) {
+            mCurrentFragment.onBackPressed();
+        }
+        super.onBackPressed();
+        mCurrentFragment = null;
+        mFragmentToLoad = QUIZ_LIST_FRAGMENT_TAG;
+    }
+
+    public void finishQuiz(final UserAnswers userAnswers, final int progress) {
+        mContainer.setVisibility(View.GONE);
+        mLoadingView.setVisibility(View.VISIBLE);
+        getFragmentManager().beginTransaction().remove(mCurrentFragment).commit();
+        mCurrentFragment = null;
+        mFragmentToLoad = QUIZ_DETAILS_FRAGMENT_TAG;
+        final Bundle args = new Bundle();
+        args.putParcelable(USER_ANSWERS, userAnswers);
+        args.putInt(Q_PROGRESS, progress);
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                userAnswers.publishChanges(QuizActivity.this);
+                updateQuizProgress(progress, userAnswers.getQuizId());
+                loadQuizDetailsFragment(userAnswers.getQuizId());
+            }
+        });
     }
 
     @Override
@@ -79,7 +120,7 @@ public class QuizActivity extends Activity implements LoaderManager.LoaderCallba
                         baseUri,
                         null, select,
                         null,
-                        QuizContract.Quizzes.QUIZ_CREATED_AT + " COLLATE LOCALIZED ASC");
+                        QuizContract.Quizzes.QUIZ_CREATED_AT + " COLLATE LOCALIZED DESC");
             case QUIZ_QUESTION_LOAD:
                 Uri questionUri = Uri.withAppendedPath(QuizContract.CONTENT_URI,
                         QuizContract.QUESTION_WITH_ANSWER);
@@ -90,6 +131,7 @@ public class QuizActivity extends Activity implements LoaderManager.LoaderCallba
                         null, qSelect,
                         null,
                         QuizContract.QuizQuestions.QUESTION_ORDER + " COLLATE LOCALIZED ASC");
+
         }
         return null;
     }
@@ -106,15 +148,34 @@ public class QuizActivity extends Activity implements LoaderManager.LoaderCallba
         } else {
             onLoadData(data);
         }
-
     }
 
-    public void loadQuizDetailsFragment(long quizId) {
+    public void hideLoadingScreen() {
+        mContainer.setVisibility(View.VISIBLE);
+        mLoadingView.setVisibility(View.GONE);
+    }
+
+    public QuizBaseFragment loadQuizDetailsFragment(long quizId) {
         QuizDetailsFragment fragment = new QuizDetailsFragment();
         Bundle arguments = new Bundle();
         arguments.putLong(QUIZ_ID, quizId);
         fragment.setArguments(arguments);
-        getFragmentManager().beginTransaction().replace(R.id.container, fragment).addToBackStack(null).commit();
+        getFragmentManager().beginTransaction()
+                .replace(R.id.container, fragment)
+                .addToBackStack(QUIZ_DETAILS_FRAGMENT_TAG)
+                .commit();
+        return fragment;
+    }
+
+    public QuizBaseFragment loadQuizzesList() {
+        QuizListFragment fragment = new QuizListFragment();
+        Bundle arguments = new Bundle();
+        fragment.setArguments(arguments);
+        getFragmentManager().beginTransaction()
+                .replace(R.id.container, fragment)
+                .addToBackStack(null)
+                .commit();
+        return fragment;
     }
 
     @Override
@@ -138,9 +199,31 @@ public class QuizActivity extends Activity implements LoaderManager.LoaderCallba
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.activity_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.db_test:
+                startActivity(new Intent(this, DataBaseTestActivity.class));
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
     public void onDatabaseSynchronized() {
         loadFragmentByName(mFragmentToLoad, mFragmentArgs);
         mProgressView.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void onDatabaseSyncProgress(int progress) {
+        mProgressView.setProgress(progress);
     }
 
     public void loadQuizProgressFragment(long quizId, int quizProgress) {
@@ -149,7 +232,10 @@ public class QuizActivity extends Activity implements LoaderManager.LoaderCallba
         arguments.putLong(QUIZ_ID, quizId);
         arguments.putInt(Q_PROGRESS, quizProgress);
         fragment.setArguments(arguments);
-        getFragmentManager().beginTransaction().replace(R.id.container, fragment).addToBackStack(null).commit();
+        getFragmentManager().beginTransaction()
+                .replace(R.id.container, fragment)
+                .addToBackStack(QUIZ_PROGRESS_FRAGMENT_TAG)
+                .commit();
     }
 
     public void loadFragmentByName(String fragmentToLoad, Bundle arguments) {
@@ -157,7 +243,7 @@ public class QuizActivity extends Activity implements LoaderManager.LoaderCallba
             case QUIZ_LIST_FRAGMENT_TAG:
                 QuizListFragment fragment = new QuizListFragment();
                 fragment.setArguments(arguments);
-                getFragmentManager().beginTransaction().replace(R.id.container, fragment).addToBackStack(null).commit();
+                getFragmentManager().beginTransaction().replace(R.id.container, fragment).addToBackStack(QUIZ_LIST_FRAGMENT_TAG).commit();
                 break;
             case QUIZ_DETAILS_FRAGMENT_TAG:
                 loadQuizDetailsFragment(arguments.getLong(QUIZ_ID));
@@ -166,5 +252,12 @@ public class QuizActivity extends Activity implements LoaderManager.LoaderCallba
                 loadQuizProgressFragment(arguments.getLong(QUIZ_ID), arguments.getInt(Q_PROGRESS));
                 break;
         }
+    }
+
+    private void updateQuizProgress(int progress, long quizId) {
+        Uri uri = Uri.withAppendedPath(QuizContract.CONTENT_URI, QuizContract.Quizzes.TABLE_NAME);
+        ContentValues values = new ContentValues();
+        values.put(QuizContract.Quizzes.QUIZ_PROGRESS, progress);
+        getContentResolver().update(uri, values, QuizContract.Quizzes.ID_QUIZ + " = " + quizId, null);
     }
 }

@@ -2,7 +2,7 @@ package pl.wp.quiz.model;
 
 import android.database.Cursor;
 
-import pl.wp.quiz.provider.QuizContract;
+import pl.wp.quiz.provider.database.QuizContract;
 
 /**
  * @author Krzysztof Betlej <k.betlej@wp.pl>.

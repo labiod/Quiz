@@ -5,7 +5,7 @@ import android.database.Cursor;
 import java.util.ArrayList;
 import java.util.List;
 
-import pl.wp.quiz.provider.QuizContract;
+import pl.wp.quiz.provider.database.QuizContract;
 
 /**
  * Created by labio on 18.02.2018.

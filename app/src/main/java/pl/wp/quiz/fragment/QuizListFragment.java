@@ -37,7 +37,6 @@ public class QuizListFragment extends QuizBaseFragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        ((QuizActivity)getActivity()).loadQuizzes(QuizActivity.QUIZZES_LOAD, null);
     }
 
     @Override
@@ -58,6 +57,14 @@ public class QuizListFragment extends QuizBaseFragment {
         });
         quizzesList.setAdapter(mQuizDetailsAdapter);
         return root;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (isVisible()) {
+            ((QuizActivity) getActivity()).loadQuizzes(QuizActivity.QUIZZES_LOAD, null);
+        }
     }
 
     @Override

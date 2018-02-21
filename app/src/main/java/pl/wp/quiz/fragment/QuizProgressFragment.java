@@ -1,7 +1,9 @@
 package pl.wp.quiz.fragment;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -18,7 +20,10 @@ import pl.wp.quiz.QuizActivity;
 import pl.wp.quiz.R;
 import pl.wp.quiz.model.AnswerModel;
 import pl.wp.quiz.model.QuestionModel;
-import pl.wp.quiz.provider.QuizContract;
+import pl.wp.quiz.model.UserAnswers;
+import pl.wp.quiz.provider.database.QuizContract;
+
+import static pl.wp.quiz.QuizActivity.QUIZ_ID;
 
 /**
  * @author Krzysztof Betlej <labiod@wp.pl>.
@@ -26,7 +31,8 @@ import pl.wp.quiz.provider.QuizContract;
  */
 
 public class QuizProgressFragment extends QuizBaseFragment {
-    public static final String TAG = QuizDetailsFragment.class.getSimpleName();
+//    public static final String TAG = QuizDetailsFragment.class.getSimpleName();
+    public static final String TAG = "[KGB]";
     private static final int[] ANSERW_IDS = {R.id.answer_1, R.id.answer_2, R.id.answer_3, R.id.answer_4};
     private int mProgress  = 0;
     private List<QuestionModel> mQuestionList;
@@ -34,10 +40,14 @@ public class QuizProgressFragment extends QuizBaseFragment {
     private TextView mQuestionText;
     private TextView mQuestionProgress;
     private RadioGroup mQuestionAnswers;
+    private UserAnswers mUserAnswers;
+    private long mQuizId;
 
     @Override
     public void onLoadData(Cursor cursor) {
         mQuestionList = retreiveQuestionsFromCursor(cursor);
+        mQuizId = getArguments().getLong(QUIZ_ID);
+        mUserAnswers = new UserAnswers(mQuizId, mQuestionList.size());
         initView(mQuestionList.get(mProgress));
     }
 
@@ -49,11 +59,17 @@ public class QuizProgressFragment extends QuizBaseFragment {
     }
 
     @Override
+    public void onBackPressed() {
+//        finishQuiz();
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.quiz_progress, container, false);
         mQuestionText = root.findViewById(R.id.question_text_view);
         mQuestionProgress = root.findViewById(R.id.question_progress);
         mQuestionAnswers = root.findViewById(R.id.question_answers);
+        mProgress = getArguments().getInt(QuizActivity.Q_PROGRESS);
         mQuestionAnswers.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
@@ -76,6 +92,8 @@ public class QuizProgressFragment extends QuizBaseFragment {
     private void initView(QuestionModel questionModel) {
         mQuestionText.setText(questionModel.getQuestionText());
         mQuestionAnswers.removeAllViews();
+        Log.d(TAG, "initView: question size :" + mQuestionList.size());
+        Log.d(TAG, "initView: progress size :" + mQuestionList.size());
         String progressText = (mProgress + 1) + "/" + mQuestionList.size();
         mQuestionProgress.setText(progressText);
         List<AnswerModel> answers = questionModel.getAnswers();
@@ -90,14 +108,13 @@ public class QuizProgressFragment extends QuizBaseFragment {
     }
 
     private void finishQuiz() {
-        ((QuizActivity)getActivity()).loadQuizDetailsFragment(mQuestionList.get(0).getQuizId());
+        ((QuizActivity)getActivity()).finishQuiz(mUserAnswers, mProgress);
     }
 
     private void saveAnswer(int checkedId) {
         //TODO: save to database
         AnswerModel questionAnswers = (AnswerModel) mQuestionAnswers.findViewById(checkedId).getTag();
-
-
+        mUserAnswers.putAnswer(questionAnswers.isCorrect() ? 1 : 0);
     }
 
     private List<QuestionModel> retreiveQuestionsFromCursor(Cursor data) {
@@ -121,6 +138,9 @@ public class QuizProgressFragment extends QuizBaseFragment {
                     actualModel.addAnswer(answerModel);
 
                 } while(data.moveToNext());
+            }
+            if (actualModel != null) {
+                result.add(actualModel);
             }
             data.close();
         }

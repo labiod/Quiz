@@ -1,22 +1,15 @@
 package pl.wp.quiz.provider.database;
 
 import android.content.Context;
-import android.database.DatabaseErrorHandler;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import pl.wp.quiz.provider.QuizContract;
-
-/**
- * Created by labio on 18.02.2018.
- */
-
-public class QuizeesDBHelper extends SQLiteOpenHelper {
+public class QuizzesDBHelper extends SQLiteOpenHelper {
     public static final int DATABASE_VERSION = 1;
     public static final String DATABASE_NAME = "QuizDB.db";
 
 
-    public QuizeesDBHelper(Context context) {
+    public QuizzesDBHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
 
     }

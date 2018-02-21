@@ -14,4 +14,8 @@ import pl.wp.quiz.model.QuizModel;
  */
 
 public abstract class QuizBaseFragment extends Fragment implements LoadDataListener<Cursor> {
+
+    public void onBackPressed() {
+
+    }
 }

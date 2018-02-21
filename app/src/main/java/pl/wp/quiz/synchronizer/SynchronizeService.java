@@ -1,6 +1,5 @@
 package pl.wp.quiz.synchronizer;
 
-import android.app.Application;
 import android.app.Service;
 import android.content.ContentValues;
 import android.content.Intent;
@@ -13,20 +12,28 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import pl.wp.quiz.QuizApplication;
 import pl.wp.quiz.listener.LoadDataListener;
-import pl.wp.quiz.provider.QuizContract;
+import pl.wp.quiz.provider.database.QuizContract;
 
-import static pl.wp.quiz.provider.QuizContract.CONTENT_URI;
-import static pl.wp.quiz.provider.QuizContract.QuestionAnswers;
-import static pl.wp.quiz.provider.QuizContract.QuizQuestions;
-import static pl.wp.quiz.provider.QuizContract.Quizzes;
+import static pl.wp.quiz.provider.database.QuizContract.CONTENT_URI;
+import static pl.wp.quiz.provider.database.QuizContract.QuestionAnswers;
+import static pl.wp.quiz.provider.database.QuizContract.QuizQuestions;
+import static pl.wp.quiz.provider.database.QuizContract.Quizzes;
 
 public class SynchronizeService extends Service implements LoadDataListener<JSONObject> {
+    private interface OnQueueEndListener {
+        void onQueueEnd();
+    }
 
     public static final String SYNCHRONIZED = "synchronized";
     public static final String TAG = SynchronizeService.class.getSimpleName();
     private Intent mSyncIntent;
+    private final LinkedList<String> mLoadingQueqe = new LinkedList<>();
+    private int mLoadProgress = 0;
 
     public SynchronizeService() {
     }
@@ -43,6 +50,7 @@ public class SynchronizeService extends Service implements LoadDataListener<JSON
             switch (intent.getAction()) {
                 case SYNCHRONIZED:
                     mSyncIntent = intent;
+                    mLoadProgress = 0;
                     QuizzesDataLoader.loadData("http://quiz.o2.pl/api/v1/quizzes/0/100", this);
                     break;
             }
@@ -69,34 +77,52 @@ public class SynchronizeService extends Service implements LoadDataListener<JSON
                 quiz.put(Quizzes.QUIZ_PHOTO_URI, item.getJSONObject("mainPhoto").getString("url"));
                 quiz.put(Quizzes.QUIZ_PROGRESS, 0);
                 final long id = item.getLong("id");
-                Uri quizUri = Uri.withAppendedPath(CONTENT_URI, "/" + Quizzes.TABLE_NAME);
+                Uri quizUri = Uri.withAppendedPath(CONTENT_URI, Quizzes.TABLE_NAME);
                 if (!quizExist(quizUri, id)) {
                     quiz.put(Quizzes.ID_QUIZ, id);
                     getContentResolver().insert(quizUri, quiz);
-                    QuizzesDataLoader.loadData(
-                            "http://quiz.o2.pl/api/v1/quiz/" + id + "/0",
-                            new LoadDataListener<JSONObject>() {
-                                @Override
-                                public void onLoadData(JSONObject dataList) {
-                                    loadQuestionData(dataList, id);
-                                }
-                            });
+                    mLoadingQueqe.add("http://quiz.o2.pl/api/v1/quiz/" + id + "/0");
                 }
             }
-            finishSync();
+
+            loadFromQuequ(new OnQueueEndListener() {
+                @Override
+                public void onQueueEnd() {
+                    finishSync();
+                }
+            });
 
         } catch (JSONException e) {
             Log.e(TAG, "onLoadData: ", e);
         }
     }
 
-    private void loadQuestionData(JSONObject dataList, long id) {
+    private void loadFromQuequ(final OnQueueEndListener onQueueEndListener) {
+        if (mLoadingQueqe.size() == 0) {
+            onQueueEndListener.onQueueEnd();
+        } else {
+            QuizzesDataLoader.loadData(mLoadingQueqe.removeFirst(),
+                    new LoadDataListener<JSONObject>() {
+                        @Override
+                        public void onLoadData(JSONObject dataList) {
+                            loadQuestionData(dataList);
+                            loadFromQuequ(onQueueEndListener);
+                            sendSyncInProgress(mLoadProgress++);
+                        }
+            });
+        }
+
+    }
+
+    private void loadQuestionData(JSONObject dataList) {
         try {
             JSONArray questions = dataList.getJSONArray("questions");
             JSONArray rates = dataList.getJSONArray("rates");
+            long id = dataList.getLong("id");
             for (int i = 0; i < questions.length(); ++i) {
                 JSONObject q = questions.getJSONObject(i);
                 ContentValues question = new ContentValues();
+
                 question.put(QuizQuestions.QUIZ_ID, id);
 
                 question.put(QuizQuestions.QUESTION_TEXT, q.getString("text"));
@@ -120,8 +146,8 @@ public class SynchronizeService extends Service implements LoadDataListener<JSON
                     getContentResolver().insert(answerUri, answerValue);
                 }
             }
-            for (int i = 0; i < rates.length(); ++i) {
-                JSONObject rate = rates.getJSONObject(i);
+            for (int r = 0; r < rates.length(); ++r) {
+                JSONObject rate = rates.getJSONObject(r);
                 ContentValues rateValue = new ContentValues();
                 rateValue.put(QuizContract.QuizRates.QUIZ_ID, id);
                 rateValue.put(QuizContract.QuizRates.RATE_FROM, rate.getInt("from"));
@@ -146,5 +172,9 @@ public class SynchronizeService extends Service implements LoadDataListener<JSON
 
     public void finishSync() {
         ((QuizApplication)getApplication()).databaseSyncFinish();
+    }
+
+    public void sendSyncInProgress(int progress) {
+        ((QuizApplication)getApplication()).databaseSyncProgress(progress);
     }
 }
