@@ -18,7 +18,7 @@ public class QuizApplication extends Application {
     }
 
     public void registerOnDatabaseUpdateListener(OnDatabaseSynchronizedListener listener) {
-        mDatabaseSynchronizedListener = new WeakReference<OnDatabaseSynchronizedListener>(listener);
+        mDatabaseSynchronizedListener = new WeakReference<>(listener);
     }
 
     public void databaseSyncFinish() {

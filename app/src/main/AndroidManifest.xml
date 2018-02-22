@@ -26,10 +26,15 @@
 
         <provider
             android:name=".provider.QuizProvider"
-            android:authorities="pl.wp.quiz.provider"
+            android:authorities="pl.wp.quiz.provider.quizzes"
             android:enabled="true"
             android:exported="true"/>
 
+        <provider
+            android:name=".provider.ImageDataProvider"
+            android:authorities="pl.wp.quiz.provider.images"
+            android:enabled="true"
+            android:exported="true"/>
         <receiver android:name=".synchronizer.SyncDataReceiver" android:exported="false">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />

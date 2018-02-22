@@ -34,6 +34,14 @@ public class ImageLoaderTask extends AsyncTask<String, Void, Bitmap> {
     }
 
     @Override
+    protected void onCancelled(Bitmap bitmap) {
+        super.onCancelled(bitmap);
+        if (bitmap != null) {
+            bitmap.recycle();
+        }
+    }
+
+    @Override
     protected void onPostExecute(Bitmap bitmap) {
         if (mListener != null) {
             mListener.onFinished(bitmap);

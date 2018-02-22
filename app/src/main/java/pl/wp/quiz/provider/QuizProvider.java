@@ -16,15 +16,15 @@ public class QuizProvider extends ContentProvider {
 
     static {
 
-        sUriMatcher.addURI("pl.wp.quiz.provider", QuizContract.Quizzes.TABLE_NAME, 1);
-        sUriMatcher.addURI("pl.wp.quiz.provider", QuizContract.QuizQuestions.TABLE_NAME, 2);
-        sUriMatcher.addURI("pl.wp.quiz.provider", QuizContract.QuestionAnswers.TABLE_NAME, 3);
-        sUriMatcher.addURI("pl.wp.quiz.provider", QuizContract.UsersAnswers.TABLE_NAME, 4);
-        sUriMatcher.addURI("pl.wp.quiz.provider", QuizContract.QuizRates.TABLE_NAME, 5);
+        sUriMatcher.addURI(QuizContract.AUTHORITY, QuizContract.Quizzes.TABLE_NAME, 1);
+        sUriMatcher.addURI(QuizContract.AUTHORITY, QuizContract.QuizQuestions.TABLE_NAME, 2);
+        sUriMatcher.addURI(QuizContract.AUTHORITY, QuizContract.QuestionAnswers.TABLE_NAME, 3);
+        sUriMatcher.addURI(QuizContract.AUTHORITY, QuizContract.UsersAnswers.TABLE_NAME, 4);
+        sUriMatcher.addURI(QuizContract.AUTHORITY, QuizContract.QuizRates.TABLE_NAME, 5);
 
-        sUriMatcher.addURI("pl.wp.quiz.provider", QuizContract.Quizzes.TABLE_NAME + "/#", 6);
-        sUriMatcher.addURI("pl.wp.quiz.provider", QuizContract.QuizQuestions.TABLE_NAME + "/#", 7);
-        sUriMatcher.addURI("pl.wp.quiz.provider", QuizContract.QUESTION_WITH_ANSWER, 8);
+        sUriMatcher.addURI(QuizContract.AUTHORITY, QuizContract.Quizzes.TABLE_NAME + "/#", 6);
+        sUriMatcher.addURI(QuizContract.AUTHORITY, QuizContract.QuizQuestions.TABLE_NAME + "/#", 7);
+        sUriMatcher.addURI(QuizContract.AUTHORITY, QuizContract.QUESTION_WITH_ANSWER, 8);
     }
 
     private QuizzesDBHelper mDbHelper;

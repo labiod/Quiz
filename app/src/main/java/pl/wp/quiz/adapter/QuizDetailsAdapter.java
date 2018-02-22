@@ -3,11 +3,14 @@ package pl.wp.quiz.adapter;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -29,7 +32,9 @@ public class QuizDetailsAdapter extends RecyclerView.Adapter<QuizDetailsAdapter.
         TextView quizTitle;
         TextView quizInfo;
         ImageView quizImage;
+        ProgressBar loadingProgress;
         View root;
+        private ImageLoaderTask mTask;
 
         public Holder(View itemView) {
             super(itemView);
@@ -37,6 +42,23 @@ public class QuizDetailsAdapter extends RecyclerView.Adapter<QuizDetailsAdapter.
             quizTitle = itemView.findViewById(R.id.quiz_title);
             quizInfo = itemView.findViewById(R.id.quiz_info);
             quizImage = itemView.findViewById(R.id.quiz_image);
+            loadingProgress = itemView.findViewById(R.id.image_loading);
+        }
+
+        public void startUploadImageTask(String imageUri) {
+            if (mTask != null && !mTask.isCancelled()) {
+                mTask.cancel(true);
+            }
+            mTask = new ImageLoaderTask(new ImageLoaderTask.OnLoadTaskListener() {
+                @Override
+                public void onFinished(Bitmap bitmap) {
+                    quizImage.setImageBitmap(bitmap);
+                    quizImage.setVisibility(View.VISIBLE);
+                    loadingProgress.setVisibility(View.INVISIBLE);
+
+                }
+            });
+            mTask.execute(imageUri);
         }
     }
 
@@ -62,6 +84,7 @@ public class QuizDetailsAdapter extends RecyclerView.Adapter<QuizDetailsAdapter.
     @Override
     public void onBindViewHolder(final Holder holder, final int position) {
         QuizModel model = mItems.get(position);
+
         holder.root.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -71,16 +94,20 @@ public class QuizDetailsAdapter extends RecyclerView.Adapter<QuizDetailsAdapter.
             }
         });
         holder.quizTitle.setText(model.getQuizTitle());
+        holder.quizImage.setVisibility(View.GONE);
+        holder.loadingProgress.setVisibility(View.VISIBLE);
         holder.quizInfo.setText(createInfoForQuiz(holder.quizImage.getContext(), model));
+        holder.startUploadImageTask(model.getQuizImage());
+    }
 
-        ImageLoaderTask task = new ImageLoaderTask(new ImageLoaderTask.OnLoadTaskListener() {
-
-            @Override
-            public void onFinished(Bitmap bitmap) {
-                holder.quizImage.setImageBitmap(bitmap);
-            }
-        });
-        task.execute(model.getQuizImage());
+    @Override
+    public void onViewRecycled(Holder holder) {
+        super.onViewRecycled(holder);
+        Drawable lastDrawable = holder.quizImage.getDrawable();
+        holder.quizImage.setImageDrawable(null);
+        if (lastDrawable != null && lastDrawable instanceof BitmapDrawable) {
+            ((BitmapDrawable) lastDrawable).getBitmap().recycle();
+        }
     }
 
     @Override

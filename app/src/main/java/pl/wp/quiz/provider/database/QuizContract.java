@@ -2,11 +2,10 @@ package pl.wp.quiz.provider.database;
 
 import android.net.Uri;
 
-import pl.wp.quiz.QuizActivity;
-
 public class QuizContract {
 
-    public static final Uri CONTENT_URI = Uri.parse("content://pl.wp.quiz.provider");
+    public static final String AUTHORITY = "pl.wp.quiz.provider.quizzes";
+    public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY);
     public static final String QUESTION_WITH_ANSWER = "question_with_answer";
 
     public static class Quizzes {
