@@ -21,29 +21,16 @@ public class QuizModel implements Parcelable {
     private int mQuestionNumber;
     private String mQuizTitle;
     private int mLastResultInfo;
-    private String mQuizImageURI;
+    private byte[] mQuizImageBytes;
     private String mQuizCategory;
     private long mCreatedDate;
     private long mId;
     private int mProgress;
 
-    /**
-     * Constructor used only for mockup
-     * @param quizTitle - name of current quiz
-     * @param lastResultInfo - number of correct answer in last result
-     * @param quizImageURI - quiz image url
-     * @param finished - true if last result is finished, false otherwise
-     */
-    public QuizModel(String quizTitle, int lastResultInfo, String quizImageURI, boolean finished) {
-        mQuizTitle = quizTitle;
-        mLastResultInfo = lastResultInfo;
-        mQuizImageURI = quizImageURI;
-    }
-
     public QuizModel(Cursor cursor) {
         mId = cursor.getLong(cursor.getColumnIndex(Quizzes.ID_QUIZ));
         mQuizTitle = cursor.getString(cursor.getColumnIndex(Quizzes.QUIZ_TITLE));
-        mQuizImageURI = cursor.getString(cursor.getColumnIndex(Quizzes.QUIZ_PHOTO_URI));
+        mQuizImageBytes = cursor.getBlob(cursor.getColumnIndex(Quizzes.QUIZ_PHOTO_BLOB));
         mQuestionNumber = cursor.getInt(cursor.getColumnIndex(Quizzes.QUESTION_NUMBER));
         mLastResultInfo = cursor.getInt(cursor.getColumnIndex(Quizzes.LAST_RESULT));
         mQuizCategory = cursor.getString(cursor.getColumnIndex(Quizzes.QUIZ_CATEGORY));
@@ -54,15 +41,14 @@ public class QuizModel implements Parcelable {
     public QuizModel(Parcel parcel) {
         mId = parcel.readLong();
         mQuizTitle = parcel.readString();
-        mQuizImageURI = parcel.readString();
         mQuestionNumber = parcel.readInt();
         mQuizCategory = parcel.readString();
         mCreatedDate = parcel.readLong();
         mProgress = parcel.readInt();
     }
 
-    public String getQuizImageURI() {
-        return mQuizImageURI;
+    public byte[] getQuizImage() {
+        return mQuizImageBytes;
     }
 
     public int getLastResultInfo() {
@@ -106,7 +92,6 @@ public class QuizModel implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeLong(mId);
         dest.writeString(mQuizTitle);
-        dest.writeString(mQuizImageURI);
         dest.writeInt(mQuestionNumber);
         dest.writeString(mQuizCategory);
         dest.writeLong(mCreatedDate);

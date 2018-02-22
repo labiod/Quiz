@@ -1,6 +1,7 @@
 package pl.wp.quiz;
 
 import android.app.Application;
+import android.os.Bundle;
 
 import java.lang.ref.WeakReference;
 
@@ -14,7 +15,7 @@ public class QuizApplication extends Application {
     private WeakReference<OnDatabaseSynchronizedListener> mDatabaseSynchronizedListener;
     public interface OnDatabaseSynchronizedListener {
         void onDatabaseSynchronized();
-        void onDatabaseSyncProgress(int progress);
+        void onDatabaseSyncProgress(int progress, Bundle args);
     }
 
     public void registerOnDatabaseUpdateListener(OnDatabaseSynchronizedListener listener) {
@@ -31,12 +32,12 @@ public class QuizApplication extends Application {
         }
     }
 
-    public void databaseSyncProgress(int progress) {
+    public void databaseSyncProgress(int progress, Bundle args) {
 
         if (mDatabaseSynchronizedListener != null) {
             OnDatabaseSynchronizedListener listener = mDatabaseSynchronizedListener.get();
             if (listener != null) {
-                listener.onDatabaseSyncProgress(progress);
+                listener.onDatabaseSyncProgress(progress, args);
             }
         }
     }

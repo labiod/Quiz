@@ -18,14 +18,14 @@ public class QuestionModel {
     private int mCorrectAnswer;
     private String mQuestionText;
     private String mQuestionType;
-    private String mImageURI;
+    private byte[] mImageBlob;
     private int mQuestionOrder;
 
     public QuestionModel(Cursor data) {
         mId = data.getLong(data.getColumnIndex(QuizContract.QuizQuestions.ID_QUESTION));
         mQuestionText = data.getString(data.getColumnIndex(QuizContract.QuizQuestions.QUESTION_TEXT));
         mQuestionType = data.getString(data.getColumnIndex(QuizContract.QuizQuestions.QUESTION_TYPE));
-        mImageURI = data.getString(data.getColumnIndex(QuizContract.QuizQuestions.QUESTION_IMAGE_URI));
+        mImageBlob = data.getBlob(data.getColumnIndex(QuizContract.QuizQuestions.QUESTION_PHOTO_BLOB));
         mQuizId = data.getLong(data.getColumnIndex(QuizContract.QuizQuestions.QUIZ_ID));
         mQuestionOrder = data.getInt(data.getColumnIndex(QuizContract.QuizQuestions.QUESTION_ORDER));
     }
