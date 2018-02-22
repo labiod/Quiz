@@ -18,9 +18,8 @@ import java.net.URL;
 import pl.wp.quiz.listener.LoadDataListener;
 
 /**
- * @author Krzysztof Betlej <k.betlej@samsung.com>.
+ * @author Krzysztof Betlej <labiod@wp.pl>.
  * @date 2/19/18
- * @copyright Copyright (c) 2016 by Samsung Electronics Polska Sp. z o. o.
  */
 
 public class QuizzesDataLoader {

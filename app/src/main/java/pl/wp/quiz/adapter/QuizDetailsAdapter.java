@@ -1,5 +1,6 @@
 package pl.wp.quiz.adapter;
 
+import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -16,6 +17,7 @@ import pl.wp.quiz.R;
 import pl.wp.quiz.listener.ImageLoadListener;
 import pl.wp.quiz.model.QuizModel;
 import pl.wp.quiz.provider.LoadImageHelper;
+import pl.wp.quiz.provider.database.QuizContract;
 
 public class QuizDetailsAdapter extends BaseAdapter {
 
@@ -72,7 +74,7 @@ public class QuizDetailsAdapter extends BaseAdapter {
         Holder holder;
         if (convertView == null) {
             LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-            convertView = inflater.inflate(R.layout.quiz_details, parent, false);
+            convertView = inflater.inflate(R.layout.quiz_list_item, parent, false);
             holder = new Holder(convertView);
             convertView.setTag(holder);
         } else {
@@ -80,12 +82,26 @@ public class QuizDetailsAdapter extends BaseAdapter {
         }
         QuizModel model = getItem(position);
         holder.quizTitle.setText(model.getQuizTitle());
-        holder.quizInfo.setText(createInfoForQuiz(model));
+        holder.quizInfo.setText(createInfoForQuiz(convertView.getContext(), model));
         LoadImageHelper.downloadImage(holder, model.getQuizImageURI());
         return convertView;
     }
 
-    private String createInfoForQuiz(QuizModel model) {
-        return model.getLastResultInfo();
+    private String createInfoForQuiz(Context context, QuizModel model) {
+        String pattern;
+        int lastResult = model.getLastResultInfo();
+        if (lastResult == -1) {
+            return context.getString(R.string.quiz_empty_result);
+        }
+        if (model.isFinished()) {
+            pattern = context.getString(R.string.quiz_last_result);
+
+
+            return String.format(pattern, lastResult, model.getQuestionNumber(),
+                    ((lastResult * 100) / model.getQuestionNumber()) + "%");
+        } else {
+            pattern = context.getString(R.string.quiz_resolved_percent);
+            return String.format(pattern, ((model.getProgress() * 100) / model.getQuestionNumber()) + "%");
+        }
     }
 }

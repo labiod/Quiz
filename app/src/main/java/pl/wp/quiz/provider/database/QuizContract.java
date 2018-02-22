@@ -1,10 +1,11 @@
-package pl.wp.quiz.provider;
+package pl.wp.quiz.provider.database;
 
 import android.net.Uri;
 
 public class QuizContract {
 
     public static final Uri CONTENT_URI = Uri.parse("content://pl.wp.quiz.provider");
+    public static final String QUESTION_WITH_ANSWER = "question_with_answer";
 
     public static class Quizzes {
         public static final String TABLE_NAME = "quizzes";
@@ -16,6 +17,7 @@ public class QuizContract {
         public static final String QUIZ_CONTENT = "quiz_content";
         public static final String QUIZ_PHOTO_URI = "quiz_photo_uri";
         public static final String QUIZ_PROGRESS = "quiz_progress";
+        public static final String LAST_RESULT = "last_result";
         public static final String QUIZ_CREATED_AT = "quiz_created_at";
 
         public static final String CREATE = "CREATE TABLE " + TABLE_NAME + "(" +
@@ -27,6 +29,7 @@ public class QuizContract {
                 QUIZ_CONTENT + " TEXT," +
                 QUIZ_PHOTO_URI + " TEXT," +
                 QUIZ_PROGRESS + " INTEGER," +
+                LAST_RESULT + " INTEGER DEFAULT -1," +
                 QUIZ_CREATED_AT + " INTEGER)";
         public static final String DELETE = "DROP TABLE IF EXISTS " + TABLE_NAME;
     }
@@ -70,15 +73,52 @@ public class QuizContract {
     }
 
     public static class UsersAnswers {
+        public static final String ANSWER_SEPARATOR = ";";
         public static final String TABLE_NAME = "users_answers";
-        public static final String ID = "";
-        public static final String ANSWER_ID = "answer_id";
+        public static final String ID = "_id";
+        public static final String QUIZ_ID = "quiz_id";
+        public static final String RATE_ID = "rate_id";
+        public static final String ANSWERS_LIST = "answers_list";
         public static final String ANSWER_DATE = "answer_date";
+        public static final String ANSWER_PROGRESS = "answer_progress";
 
         public static final String CREATE = "CREATE TABLE " + TABLE_NAME + "(" +
                 ID + " INTEGER PRIMARY KEY," +
-                ANSWER_ID + " INTEGER," +
+                QUIZ_ID + " INTEGER," +
+                ANSWERS_LIST + " INTEGER," +
+                ANSWER_PROGRESS + " INTEGER," +
+                RATE_ID + " INTEGER," +
                 ANSWER_DATE + " INTEGER)";
+        public static final String DELETE = "DROP TABLE IF EXISTS " + TABLE_NAME;
+    }
+
+    public static class QuizRates {
+        public static final String TABLE_NAME = "quiz_rates";
+        public static final String ID_RATE = "id_rate";
+        public static final String QUIZ_ID = "quiz_id";
+        public static final String RATE_FROM = "rate_from";
+        public static final String RATE_TO = "rate_to";
+        public static final String RATE_CONTENT = "rate_content";
+
+        public static final String CREATE = "CREATE TABLE " + TABLE_NAME + "(" +
+                ID_RATE + " INTEGER PRIMARY KEY," +
+                QUIZ_ID + " INTEGER ," +
+                RATE_FROM + " INTEGER ," +
+                RATE_TO + " INTEGER ," +
+                RATE_CONTENT + " TEXT)";
+        public static final String DELETE = "DROP TABLE IF EXISTS " + TABLE_NAME;
+    }
+
+    public static class Config {
+        public static final String TABLE_NAME = "sync_config";
+        public static final String ID_CONFIG = "id_config";
+        public static final String SYNC_DATE = "sync_date";
+        public static final String SYNC_STATUS = "sync_status";
+
+        public static final String CREATE = "CREATE TABLE " + TABLE_NAME + "(" +
+                ID_CONFIG + " INTEGER PRIMARY KEY," +
+                SYNC_DATE + " INTEGER ," +
+                SYNC_STATUS + " INTEGER)";
         public static final String DELETE = "DROP TABLE IF EXISTS " + TABLE_NAME;
     }
 
