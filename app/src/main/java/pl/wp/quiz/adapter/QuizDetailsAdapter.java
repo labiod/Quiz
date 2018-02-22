@@ -89,17 +89,19 @@ public class QuizDetailsAdapter extends BaseAdapter {
 
     private String createInfoForQuiz(Context context, QuizModel model) {
         String pattern;
+        int lastResult = model.getLastResultInfo();
+        if (lastResult == -1) {
+            return context.getString(R.string.quiz_empty_result);
+        }
         if (model.isFinished()) {
-            pattern = context.getString(R.string.quiz_empty_result);
-            int lastResult = model.getLastResultInfo();
-            if (lastResult == -1) {
-                return context.getString(R.string.quiz_last_result);
-            }
+            pattern = context.getString(R.string.quiz_last_result);
+
+
             return String.format(pattern, lastResult, model.getQuestionNumber(),
-                    (lastResult * 100) / model.getQuestionNumber());
+                    ((lastResult * 100) / model.getQuestionNumber()) + "%");
         } else {
             pattern = context.getString(R.string.quiz_resolved_percent);
-            return String.format(pattern, (model.getProgress() * 100) / model.getQuestionNumber());
+            return String.format(pattern, ((model.getProgress() * 100) / model.getQuestionNumber()) + "%");
         }
     }
 }
