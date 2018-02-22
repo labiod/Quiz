@@ -10,9 +10,8 @@ import android.os.Parcelable;
 import pl.wp.quiz.provider.database.QuizContract;
 
 /**
- * @author Krzysztof Betlej <k.betlej@samsung.com>.
+ * @author Krzysztof Betlej <labiod@wp.pl>.
  * @date 2/20/18
- * @copyright Copyright (c) 2016 by Samsung Electronics Polska Sp. z o. o.
  */
 
 public class UserAnswers implements Parcelable {

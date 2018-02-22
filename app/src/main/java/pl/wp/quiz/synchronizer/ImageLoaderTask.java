@@ -1,4 +1,4 @@
-package pl.wp.quiz.provider;
+package pl.wp.quiz.synchronizer;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -20,8 +20,8 @@ public class ImageLoaderTask extends AsyncTask<String, Void, Bitmap> {
 
 
     @Override
-    protected Bitmap doInBackground(String... strings) {
-        String imageUrl = strings[0];
+    protected Bitmap doInBackground(String... items) {
+        String imageUrl = items[0];
         Bitmap result = null;
         try {
             InputStream in = new java.net.URL(imageUrl).openStream();

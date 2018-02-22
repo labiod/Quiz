@@ -4,7 +4,9 @@ import android.app.Service;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
 
@@ -12,6 +14,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -31,7 +35,8 @@ public class SynchronizeService extends Service implements LoadDataListener<JSON
 
     public static final String SYNCHRONIZED = "synchronized";
     public static final String TAG = SynchronizeService.class.getSimpleName();
-    private Intent mSyncIntent;
+    public static final String MESSAGE_INFO = "message";
+    public static final String MAX_PROGRESS = "max_progress";
     private final LinkedList<String> mLoadingQueqe = new LinkedList<>();
     private int mLoadProgress = 0;
 
@@ -49,7 +54,6 @@ public class SynchronizeService extends Service implements LoadDataListener<JSON
 
             switch (intent.getAction()) {
                 case SYNCHRONIZED:
-                    mSyncIntent = intent;
                     mLoadProgress = 0;
                     QuizzesDataLoader.loadData("http://quiz.o2.pl/api/v1/quizzes/0/100", this);
                     break;
@@ -89,12 +93,31 @@ public class SynchronizeService extends Service implements LoadDataListener<JSON
                 @Override
                 public void onQueueEnd() {
                     finishSync();
+
                 }
             });
 
         } catch (JSONException e) {
             Log.e(TAG, "onLoadData: ", e);
         }
+    }
+
+    private void putBitmapToDataBase(Bitmap bitmap, ImageLoadItem item) {
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        try {
+            bitmap.compress(Bitmap.CompressFormat.PNG, 80, bytes);
+            bitmap.recycle();
+        } catch (Exception e) {
+            Log.e("Error", "message", e);
+            e.printStackTrace();
+        }
+        ContentValues values = new ContentValues();
+        values.put(item.getImageColumn(), bytes.toByteArray());
+        Uri uri = Uri.withAppendedPath(QuizContract.CONTENT_URI, item.getTableName());
+        getContentResolver().update(uri,
+                values,
+                QuizContract.getIdForTable(item.getTableName()) + " = " + item.getId(),
+                null);
     }
 
     private void loadFromQuequ(final OnQueueEndListener onQueueEndListener) {
@@ -126,9 +149,9 @@ public class SynchronizeService extends Service implements LoadDataListener<JSON
                 question.put(QuizQuestions.QUIZ_ID, id);
 
                 question.put(QuizQuestions.QUESTION_TEXT, q.getString("text"));
-                question.put(QuizQuestions.QUESTION_IMAGE_URI, q.getJSONObject("image").getString("url"));
                 question.put(QuizQuestions.QUESTION_TYPE, q.getString("type"));
                 question.put(QuizQuestions.QUESTION_ORDER, q.getInt("order"));
+                question.put(QuizQuestions.QUESTION_PHOTO_URI, q.getJSONObject("image").getString("url"));
                 Uri questionUri = Uri.withAppendedPath(CONTENT_URI, "/" + QuizQuestions.TABLE_NAME);
                 long qId = Long.parseLong(getContentResolver().insert(questionUri, question).getLastPathSegment());
                 JSONArray answers = q.getJSONArray("answers");
@@ -139,9 +162,7 @@ public class SynchronizeService extends Service implements LoadDataListener<JSON
                     answerValue.put(QuestionAnswers.ANSWER_TEXT, answer.getString("text"));
                     answerValue.put(QuestionAnswers.IS_CORRECT, answer.has("isCorrect") ? 1 : 0);
                     answerValue.put(QuestionAnswers.ANSWER_ORDER, answer.getInt("order"));
-                    answerValue.put(QuestionAnswers.ANSWER_IMAGE_URI, answer.getJSONObject("image")
-                            .getString("url"));
-
+                    answerValue.put(QuestionAnswers.ANSWER_IMAGE_URI, answer.getJSONObject("image").getString("url"));
                     Uri answerUri = Uri.withAppendedPath(CONTENT_URI, "/" + QuestionAnswers.TABLE_NAME);
                     getContentResolver().insert(answerUri, answerValue);
                 }

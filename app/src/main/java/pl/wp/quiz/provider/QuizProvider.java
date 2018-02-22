@@ -23,7 +23,8 @@ public class QuizProvider extends ContentProvider {
         sUriMatcher.addURI("pl.wp.quiz.provider", QuizContract.QuizRates.TABLE_NAME, 5);
 
         sUriMatcher.addURI("pl.wp.quiz.provider", QuizContract.Quizzes.TABLE_NAME + "/#", 6);
-        sUriMatcher.addURI("pl.wp.quiz.provider", QuizContract.QUESTION_WITH_ANSWER, 7);
+        sUriMatcher.addURI("pl.wp.quiz.provider", QuizContract.QuizQuestions.TABLE_NAME + "/#", 7);
+        sUriMatcher.addURI("pl.wp.quiz.provider", QuizContract.QUESTION_WITH_ANSWER, 8);
     }
 
     private QuizzesDBHelper mDbHelper;
@@ -125,7 +126,7 @@ public class QuizProvider extends ContentProvider {
                 }
                 Log.d(TAG, "query: " + query);
                 return mDbHelper.getReadableDatabase().rawQuery(query, null);
-            case 7:
+            case 8:
                 String qQuery = "SELECT * FROM " + QuizContract.QuizQuestions.TABLE_NAME + " qq " +
                         "INNER JOIN " + QuizContract.QuestionAnswers.TABLE_NAME + " qa " +
                         "WHERE qq.id_question = qa.question_id";

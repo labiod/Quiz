@@ -8,7 +8,8 @@ import java.util.List;
 import pl.wp.quiz.provider.database.QuizContract;
 
 /**
- * Created by labio on 18.02.2018.
+ * @author Krzysztof Betlej <k.betlej@labiod.wp.pl>.
+ * @date 18.02.2018
  */
 
 public class QuestionModel {
@@ -25,7 +26,7 @@ public class QuestionModel {
         mId = data.getLong(data.getColumnIndex(QuizContract.QuizQuestions.ID_QUESTION));
         mQuestionText = data.getString(data.getColumnIndex(QuizContract.QuizQuestions.QUESTION_TEXT));
         mQuestionType = data.getString(data.getColumnIndex(QuizContract.QuizQuestions.QUESTION_TYPE));
-        mImageURI = data.getString(data.getColumnIndex(QuizContract.QuizQuestions.QUESTION_IMAGE_URI));
+        mImageURI = data.getString(data.getColumnIndex(QuizContract.QuizQuestions.QUESTION_PHOTO_URI));
         mQuizId = data.getLong(data.getColumnIndex(QuizContract.QuizQuestions.QUIZ_ID));
         mQuestionOrder = data.getInt(data.getColumnIndex(QuizContract.QuizQuestions.QUESTION_ORDER));
     }

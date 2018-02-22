@@ -8,4 +8,5 @@
     <string name="quiz_resolved_percent">Quiz %s resolved</string>
     <string name="quiz_last_result">Last result %d/%d %s</string>
     <string name="quiz_empty_result">There is no result for this quiz</string>
+    <string name="loading_data_info">Loading Quizzes data</string>
 </resources>

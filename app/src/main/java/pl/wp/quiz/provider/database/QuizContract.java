@@ -2,6 +2,8 @@ package pl.wp.quiz.provider.database;
 
 import android.net.Uri;
 
+import pl.wp.quiz.QuizActivity;
+
 public class QuizContract {
 
     public static final Uri CONTENT_URI = Uri.parse("content://pl.wp.quiz.provider");
@@ -41,7 +43,7 @@ public class QuizContract {
         public static final String QUESTION_TEXT = "question_text";
         public static final String QUESTION_TYPE = "question_type";
         public static final String QUESTION_ORDER = "question_order";
-        public static final String QUESTION_IMAGE_URI = "question_image_uri";
+        public static final String QUESTION_PHOTO_URI = "question_photo_uri";
 
         public static final String CREATE = "CREATE TABLE " + TABLE_NAME + "(" +
                 ID_QUESTION + " INTEGER PRIMARY KEY," +
@@ -49,7 +51,7 @@ public class QuizContract {
                 QUESTION_TEXT + " TEXT," +
                 QUESTION_TYPE + " TEXT," +
                 QUESTION_ORDER + " INTEGER," +
-                QUESTION_IMAGE_URI + " TEXT)";
+                QUESTION_PHOTO_URI + " TEXT)";
         public static final String DELETE = "DROP TABLE IF EXISTS " + TABLE_NAME;
     }
 
@@ -122,4 +124,18 @@ public class QuizContract {
         public static final String DELETE = "DROP TABLE IF EXISTS " + TABLE_NAME;
     }
 
+    public static String getIdForTable(String tableName) {
+        switch (tableName) {
+            case Quizzes.TABLE_NAME:
+                return Quizzes.ID_QUIZ;
+            case QuizQuestions.TABLE_NAME:
+                return QuizQuestions.ID_QUESTION;
+            case QuestionAnswers.TABLE_NAME:
+                return QuestionAnswers.ID_ANSWER;
+            case QuizRates.ID_RATE:
+                return QuizRates.ID_RATE;
+            default:
+                return "_id";
+        }
+    }
 }
