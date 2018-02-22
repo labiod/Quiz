@@ -1,0 +1,42 @@
+package pl.wp.quiz.provider;
+
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
+import android.util.Log;
+
+import java.io.InputStream;
+
+public class ImageLoaderTask extends AsyncTask<String, Void, Bitmap> {
+    public interface OnLoadTaskListener {
+        void onFinished(Bitmap bitmap);
+    }
+
+    private OnLoadTaskListener mListener;
+
+    public ImageLoaderTask(OnLoadTaskListener listener) {
+        mListener = listener;
+    }
+
+
+    @Override
+    protected Bitmap doInBackground(String... strings) {
+        String imageUrl = strings[0];
+        Bitmap result = null;
+        try {
+            InputStream in = new java.net.URL(imageUrl).openStream();
+            result = BitmapFactory.decodeStream(in);
+        } catch (Exception e) {
+            Log.e("Error", e.getMessage());
+            e.printStackTrace();
+        }
+        return result;
+    }
+
+    @Override
+    protected void onPostExecute(Bitmap bitmap) {
+        if (mListener != null) {
+            mListener.onFinished(bitmap);
+        }
+    }
+}

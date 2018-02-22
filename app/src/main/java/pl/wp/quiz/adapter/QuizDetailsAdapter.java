@@ -1,6 +1,7 @@
 package pl.wp.quiz.adapter;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -16,14 +17,13 @@ import java.util.List;
 import pl.wp.quiz.R;
 import pl.wp.quiz.listener.ImageLoadListener;
 import pl.wp.quiz.model.QuizModel;
-import pl.wp.quiz.provider.LoadImageHelper;
-import pl.wp.quiz.provider.database.QuizContract;
+import pl.wp.quiz.provider.ImageLoaderTask;
 
 public class QuizDetailsAdapter extends BaseAdapter {
 
     public static final String TAG = QuizDetailsAdapter.class.getSimpleName();
 
-    private class Holder implements ImageLoadListener {
+    private class Holder implements ImageLoaderTask.OnLoadTaskListener {
         TextView quizTitle;
         TextView quizInfo;
         ImageView quizImage;
@@ -35,9 +35,8 @@ public class QuizDetailsAdapter extends BaseAdapter {
         }
 
         @Override
-        public void onImageLoaded(String source) {
-            Log.d(TAG, "onImageLoaded: source load");
-//            quizImage.setImageDrawable(sourceToDrawable(source));
+        public void onFinished(Bitmap bitmap) {
+            quizImage.setImageBitmap(bitmap);
         }
 
         private Drawable sourceToDrawable(String source) {
@@ -83,7 +82,8 @@ public class QuizDetailsAdapter extends BaseAdapter {
         QuizModel model = getItem(position);
         holder.quizTitle.setText(model.getQuizTitle());
         holder.quizInfo.setText(createInfoForQuiz(convertView.getContext(), model));
-        LoadImageHelper.downloadImage(holder, model.getQuizImageURI());
+        ImageLoaderTask task = new ImageLoaderTask(holder);
+        task.execute(model.getQuizImageURI());
         return convertView;
     }
 

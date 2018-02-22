@@ -47,7 +47,6 @@ public class QuizProvider extends ContentProvider {
     public Uri insert(Uri uri, ContentValues values) {
         switch (sUriMatcher.match(uri)) {
             case 4:
-                long rateId = 0;
                 String[] answers = values.getAsString(QuizContract.UsersAnswers.ANSWERS_LIST)
                         .split(QuizContract.UsersAnswers.ANSWER_SEPARATOR);
                 int answerCount = answers.length;
