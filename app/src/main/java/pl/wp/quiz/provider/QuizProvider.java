@@ -45,6 +45,41 @@ public class QuizProvider extends ContentProvider {
 
     @Override
     public Uri insert(Uri uri, ContentValues values) {
+        switch (sUriMatcher.match(uri)) {
+            case 4:
+                long rateId = 0;
+                String[] answers = values.getAsString(QuizContract.UsersAnswers.ANSWERS_LIST)
+                        .split(QuizContract.UsersAnswers.ANSWER_SEPARATOR);
+                int answerCount = answers.length;
+                int answerRate = 0;
+                for (int i = 0; i < answerCount; ++i) {
+                    answerRate += Integer.parseInt(answers[i]);
+                }
+                answerRate = (answerRate * 100) / answerCount;
+                Cursor cursor = mDbHelper.getReadableDatabase().query(QuizContract.QuizRates.TABLE_NAME,
+                        null,
+                        QuizContract.QuizRates.QUIZ_ID + " = " + values.getAsLong(QuizContract.UsersAnswers.QUIZ_ID),
+                        null,
+                        null,
+                        null,
+                        null
+                );
+                if (cursor != null) {
+                    if (cursor.getColumnCount() > 0 && cursor.moveToFirst()) {
+                        do {
+                            int from = cursor.getInt(cursor.getColumnIndex(QuizContract.QuizRates.RATE_FROM));
+                            int to = cursor.getInt(cursor.getColumnIndex(QuizContract.QuizRates.RATE_TO));
+                            if (answerRate > from && answerRate <= to) {
+                                values.put(QuizContract.UsersAnswers.RATE_ID,
+                                        cursor.getLong(cursor.getColumnIndex(QuizContract.QuizRates.ID_RATE)));
+                                break;
+                            }
+                        } while (cursor.moveToNext());
+                    }
+                    cursor.close();
+                }
+                break;
+        }
         String table = uri.getLastPathSegment();
         long id = mDbHelper.getWritableDatabase().insert(table, null, values);
         return Uri.withAppendedPath(QuizContract.CONTENT_URI, "/" + id);
@@ -77,12 +112,18 @@ public class QuizProvider extends ContentProvider {
             case 6:
                 String id = uri.getLastPathSegment();
                 Log.d(TAG, "query: id: " + id);
-                String query = "SELECT " + QuizContract.UsersAnswers.ANSWERS_LIST +
-                        ", " + QuizContract.Quizzes.QUESTION_NUMBER + " " +
+                String query = "SELECT " + QuizContract.UsersAnswers.ANSWERS_LIST + ", " +
+                        QuizContract.Quizzes.QUESTION_NUMBER + ", " +
+                        QuizContract.QuizRates.RATE_CONTENT + " " +
                         "FROM " + QuizContract.UsersAnswers.TABLE_NAME + " uq " +
                         "INNER JOIN " + QuizContract.Quizzes.TABLE_NAME + " q " +
                         "ON uq." + QuizContract.UsersAnswers.QUIZ_ID + " = q." + QuizContract.Quizzes.ID_QUIZ +  " " +
+                        "INNER JOIN " + QuizContract.QuizRates.TABLE_NAME + " qr " +
+                        "ON uq." + QuizContract.UsersAnswers.RATE_ID + " = qr." + QuizContract.QuizRates.ID_RATE +  " " +
                         "WHERE uq." + QuizContract.QuizQuestions.QUIZ_ID + " = " + id;
+                if (sortOrder != null && !sortOrder.trim().isEmpty()) {
+                    query += " ORDER BY " + sortOrder;
+                }
                 Log.d(TAG, "query: " + query);
                 return mDbHelper.getReadableDatabase().rawQuery(query, null);
             case 7:
@@ -107,6 +148,40 @@ public class QuizProvider extends ContentProvider {
     @Override
     public int update(Uri uri, ContentValues values, String selection,
                       String[] selectionArgs) {
+        switch (sUriMatcher.match(uri)) {
+            case 4:
+                String[] answers = values.getAsString(QuizContract.UsersAnswers.ANSWERS_LIST)
+                        .split(QuizContract.UsersAnswers.ANSWER_SEPARATOR);
+                int answerCount = answers.length;
+                int answerRate = 0;
+                for (int i = 0; i < answerCount; ++i) {
+                    answerRate += Integer.parseInt(answers[i]);
+                }
+                answerRate = (answerRate * 100) / answerCount;
+                Cursor cursor = mDbHelper.getReadableDatabase().query(QuizContract.QuizRates.TABLE_NAME,
+                        null,
+                        QuizContract.QuizRates.QUIZ_ID + " = " + values.getAsLong(QuizContract.UsersAnswers.QUIZ_ID),
+                        null,
+                        null,
+                        null,
+                        null
+                        );
+                if (cursor != null) {
+                    if (cursor.getColumnCount() > 0 && cursor.moveToFirst()) {
+                        do {
+                            int from = cursor.getInt(cursor.getColumnIndex(QuizContract.QuizRates.RATE_FROM));
+                            int to = cursor.getInt(cursor.getColumnIndex(QuizContract.QuizRates.RATE_FROM));
+                            if (answerRate > from && answerRate <= to) {
+                                values.put(QuizContract.UsersAnswers.RATE_ID,
+                                        cursor.getLong(cursor.getColumnIndex(QuizContract.QuizRates.ID_RATE)));
+                                break;
+                            }
+                        } while (cursor.moveToNext());
+                    }
+                    cursor.close();
+                }
+                break;
+        }
         String table = uri.getLastPathSegment();
         return mDbHelper.getWritableDatabase().update(table, values, selection, selectionArgs);
     }

@@ -20,7 +20,7 @@ public class QuizModel implements Parcelable {
     };
     private int mQuestionNumber;
     private String mQuizTitle;
-    private String mLastResultInfo;
+    private int mLastResultInfo;
     private String mQuizImageURI;
     private String mQuizCategory;
     private long mCreatedDate;
@@ -30,11 +30,11 @@ public class QuizModel implements Parcelable {
     /**
      * Constructor used only for mockup
      * @param quizTitle - name of current quiz
-     * @param lastResultInfo - info about
+     * @param lastResultInfo - number of correct answer in last result
      * @param quizImageURI - quiz image url
      * @param finished - true if last result is finished, false otherwise
      */
-    public QuizModel(String quizTitle, String lastResultInfo, String quizImageURI, boolean finished) {
+    public QuizModel(String quizTitle, int lastResultInfo, String quizImageURI, boolean finished) {
         mQuizTitle = quizTitle;
         mLastResultInfo = lastResultInfo;
         mQuizImageURI = quizImageURI;
@@ -45,6 +45,7 @@ public class QuizModel implements Parcelable {
         mQuizTitle = cursor.getString(cursor.getColumnIndex(Quizzes.QUIZ_TITLE));
         mQuizImageURI = cursor.getString(cursor.getColumnIndex(Quizzes.QUIZ_PHOTO_URI));
         mQuestionNumber = cursor.getInt(cursor.getColumnIndex(Quizzes.QUESTION_NUMBER));
+        mLastResultInfo = cursor.getInt(cursor.getColumnIndex(Quizzes.LAST_RESULT));
         mQuizCategory = cursor.getString(cursor.getColumnIndex(Quizzes.QUIZ_CATEGORY));
         mCreatedDate = cursor.getLong(cursor.getColumnIndex(Quizzes.QUIZ_CATEGORY));
         mProgress = cursor.getInt(cursor.getColumnIndex(Quizzes.QUIZ_PROGRESS));
@@ -64,8 +65,8 @@ public class QuizModel implements Parcelable {
         return mQuizImageURI;
     }
 
-    public String getLastResultInfo() {
-        return mLastResultInfo == null ? "Brak rozwiązania" : mLastResultInfo;
+    public int getLastResultInfo() {
+        return mLastResultInfo;
     }
 
     public String getQuizTitle() {

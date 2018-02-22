@@ -68,6 +68,12 @@ public class QuizListFragment extends QuizBaseFragment {
     }
 
     @Override
+    public boolean onBackPressed() {
+        getFragmentManager().popBackStackImmediate();
+        return super.onBackPressed();
+    }
+
+    @Override
     public void onLoadData(Cursor cursor) {
         List<QuizModel> quizModels = reteiveQuizzesForCursor(cursor);
         mQuizDetailsAdapter.setQuizzes(quizModels);

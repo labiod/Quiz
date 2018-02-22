@@ -25,6 +25,7 @@ public class QuizDetailsFragment extends QuizBaseFragment {
     public static final String TAG = QuizDetailsFragment.class.getSimpleName();
     private TextView mQuizResultView;
     private TextView mQuizRate;
+    private TextView mAnserAtText;
 
     @Override
     public void onLoadData(Cursor cursor) {
@@ -33,6 +34,10 @@ public class QuizDetailsFragment extends QuizBaseFragment {
             if (cursor.getCount() > 0 && cursor.moveToFirst()) {
                 int correctAnswer = getCorrectAnswer(cursor);
                 int questionNumber = cursor.getInt(cursor.getColumnIndex(QuizContract.Quizzes.QUESTION_NUMBER));
+                String rateText = cursor.getString(cursor.getColumnIndex(QuizContract.QuizRates.RATE_CONTENT));
+                mQuizRate.setText(rateText);
+                String pattern = mAnserAtText.getText().toString();
+                mAnserAtText.setText(String.format(pattern, correctAnswer));
                 if (questionNumber != 0) {
                     String quizResult = String.valueOf(correctAnswer * 100 / questionNumber) + " %";
                     mQuizResultView.setText(quizResult);
@@ -56,6 +61,13 @@ public class QuizDetailsFragment extends QuizBaseFragment {
     }
 
     @Override
+    public boolean onBackPressed() {
+        getFragmentManager().popBackStack(QuizActivity.QUIZ_LIST_FRAGMENT_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+        ((QuizActivity)getActivity()).loadQuizzesList();
+        return true;
+    }
+
+    @Override
     public void onAttach(Context context) {
         super.onAttach(context);
         ((QuizActivity)getActivity()).loadQuizzes(QuizActivity.QUIZ_DETAILS_LOAD, getArguments());
@@ -65,12 +77,13 @@ public class QuizDetailsFragment extends QuizBaseFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.quiz_details, container, false);
         mQuizResultView = root.findViewById(R.id.quiz_result);
+        mAnserAtText = root.findViewById(R.id.answer_at_view);
         mQuizRate = root.findViewById(R.id.rate_text);
         Button back = root.findViewById(R.id.back_to_list);
         back.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                getFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+                getFragmentManager().popBackStack(QuizActivity.QUIZ_LIST_FRAGMENT_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE);
                 ((QuizActivity)getActivity()).loadQuizzesList();
             }
         });
@@ -78,7 +91,7 @@ public class QuizDetailsFragment extends QuizBaseFragment {
         repeatQuiz.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                getFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+                getFragmentManager().popBackStack(QuizActivity.QUIZ_DETAILS_FRAGMENT_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE);
                 ((QuizActivity)getActivity()).loadQuizProgressFragment(getArguments().getLong(QuizActivity.QUIZ_ID), 0);
             }
         });

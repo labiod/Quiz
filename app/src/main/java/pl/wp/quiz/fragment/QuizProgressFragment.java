@@ -47,8 +47,29 @@ public class QuizProgressFragment extends QuizBaseFragment {
     public void onLoadData(Cursor cursor) {
         mQuestionList = retreiveQuestionsFromCursor(cursor);
         mQuizId = getArguments().getLong(QUIZ_ID);
-        mUserAnswers = new UserAnswers(mQuizId, mQuestionList.size());
+        if (mProgress > 0) {
+            mUserAnswers = loadLastUnfinishedAnswer(mQuizId);
+        } else {
+            mUserAnswers = new UserAnswers(mQuizId, mQuestionList.size());
+        }
         initView(mQuestionList.get(mProgress));
+    }
+
+    private UserAnswers loadLastUnfinishedAnswer(long quizId) {
+        UserAnswers result = new UserAnswers(mQuizId, mQuestionList.size());
+        Cursor cursor = getActivity().getContentResolver().query(
+                Uri.withAppendedPath(QuizContract.CONTENT_URI, QuizContract.UsersAnswers.TABLE_NAME),
+                null,
+                QuizContract.UsersAnswers.QUIZ_ID + " = " + quizId,
+                null,
+                QuizContract.UsersAnswers.ANSWER_DATE + " DESC");
+        if (cursor != null) {
+            if (cursor.getColumnCount() > 0 && cursor.moveToFirst()) {
+                result =  new UserAnswers(cursor);
+            }
+            cursor.close();
+        }
+        return result;
     }
 
     @Override
@@ -59,8 +80,9 @@ public class QuizProgressFragment extends QuizBaseFragment {
     }
 
     @Override
-    public void onBackPressed() {
-//        finishQuiz();
+    public boolean onBackPressed() {
+        finishQuiz();
+        return true;
     }
 
     @Override

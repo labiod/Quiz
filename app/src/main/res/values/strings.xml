@@ -1,8 +1,11 @@
 <resources>
     <string name="app_name">Quizzes listing</string>
     <string name="quiz_description_title">Quiz description</string>
-    <string name="answer_on_question">You answer at: %i questions</string>
+    <string name="answer_on_question">You answer at: %d questions</string>
     <string name="db_test_text">DB test</string>
     <string name="back_to_quizzes_list_text">Back to quizzes list</string>
     <string name="repeat_quiz">Repeat quiz</string>
+    <string name="quiz_resolved_percent">Quiz %d% resolved</string>
+    <string name="quiz_last_result">Last result %d/%d %d%</string>
+    <string name="quiz_empty_result">There is no result for this quiz</string>
 </resources>

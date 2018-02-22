@@ -2,6 +2,7 @@ package pl.wp.quiz.model;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -46,11 +47,34 @@ public class UserAnswers implements Parcelable {
         mQuestionNumber = source.readInt();
         mList = new int[mQuestionNumber];
         source.readIntArray(mList);
+    }
 
+    public UserAnswers(Cursor cursor) {
+        mId = cursor.getLong(cursor.getColumnIndex(QuizContract.UsersAnswers.ID));
+        mQuizId = cursor.getLong(cursor.getColumnIndex(QuizContract.UsersAnswers.QUIZ_ID));
+        mAnwserIndex = cursor.getInt(cursor.getColumnIndex(QuizContract.UsersAnswers.ANSWER_PROGRESS));
+        String[] answers = cursor.getString(cursor.getColumnIndex(QuizContract.UsersAnswers.ANSWERS_LIST)).split(QuizContract.UsersAnswers.ANSWER_SEPARATOR);
+        mQuestionNumber = answers.length;
+        mList = new int[mQuestionNumber];
+        for(int i = 0; i < mQuestionNumber; ++i) {
+            mList[i] = Integer.parseInt(answers[i]);
+        }
     }
 
     public long getQuizId() {
         return mQuizId;
+    }
+
+    public int getQuestionNumber() {
+        return mQuestionNumber;
+    }
+
+    public int getCorrectAnswers() {
+        int result = 0;
+        for (int i = 0; i < mQuestionNumber; ++i) {
+            result += mList[i];
+        }
+        return result;
     }
 
     public void publishChanges(Context context) {
@@ -86,6 +110,7 @@ public class UserAnswers implements Parcelable {
         ContentValues contentValues = new ContentValues();
         contentValues.put(QuizContract.UsersAnswers.QUIZ_ID, mQuizId);
         contentValues.put(QuizContract.UsersAnswers.ANSWERS_LIST, answersToList());
+        contentValues.put(QuizContract.UsersAnswers.ANSWER_PROGRESS, mAnwserIndex);
         contentValues.put(QuizContract.UsersAnswers.ANSWER_DATE, System.currentTimeMillis());
         return contentValues;
     }
