@@ -1,9 +1,8 @@
 package pl.wp.quiz.synchronizer;
 
 /**
- * @author Krzysztof Betlej <k.betlej@samsung.com>.
+ * @author Krzysztof Betlej <labiod@wp.pl>.
  * @date 2/22/18
- * @copyright Copyright (c) 2016 by Samsung Electronics Polska Sp. z o. o.
  */
 
 public class ImageLoadItem {

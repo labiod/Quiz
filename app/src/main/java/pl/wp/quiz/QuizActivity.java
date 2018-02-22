@@ -44,9 +44,7 @@ public class QuizActivity extends FragmentActivity implements LoaderManager.Load
     public static final String QUIZ_LIST_FRAGMENT_TAG = "quiz_list_fragment_tag";
     public static final String QUIZ_DETAILS_FRAGMENT_TAG = "quiz_details_fragment_tag";
     public static final String QUIZ_PROGRESS_FRAGMENT_TAG = "quiz_progress_fragment_tag";
-    public static final String QUIZ_MODEL = "QUIZ_MODEL";
     public static final String USER_ANSWERS = "user_answers";
-    public static final String TAG = QuizActivity.class.getSimpleName();
 
     private QuizBaseFragment mCurrentFragment;
     private final Handler mHandler = new Handler();
@@ -238,13 +236,7 @@ public class QuizActivity extends FragmentActivity implements LoaderManager.Load
     }
 
     @Override
-    public void onDatabaseSyncProgress(int progress, Bundle args) {
-        if (args != null) {
-            int maxProgress = args.getInt(SynchronizeService.MAX_PROGRESS, 100);
-            Log.d(TAG, "onDatabaseSyncProgress: image to load :" + maxProgress);
-            mProgressViewInfo.setText(args.getString(SynchronizeService.MESSAGE_INFO, getString(R.string.loading_data_info)));
-            mProgressView.setMax(args.getInt(SynchronizeService.MAX_PROGRESS, 100));
-        }
+    public void onDatabaseSyncProgress(int progress) {
         mProgressView.setProgress(progress);
     }
 

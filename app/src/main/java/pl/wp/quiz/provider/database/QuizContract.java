@@ -17,7 +17,7 @@ public class QuizContract {
         public static final String QUIZ_TYPE = "quiz_type";
         public static final String QUIZ_CATEGORY = "quiz_category";
         public static final String QUIZ_CONTENT = "quiz_content";
-        public static final String QUIZ_PHOTO_BLOB = "quiz_photo_blob";
+        public static final String QUIZ_PHOTO_URI = "quiz_photo_uri";
         public static final String QUIZ_PROGRESS = "quiz_progress";
         public static final String LAST_RESULT = "last_result";
         public static final String QUIZ_CREATED_AT = "quiz_created_at";
@@ -29,7 +29,7 @@ public class QuizContract {
                 QUIZ_TYPE + " TEXT," +
                 QUIZ_CATEGORY + " TEXT," +
                 QUIZ_CONTENT + " TEXT," +
-                QUIZ_PHOTO_BLOB + " BLOB," +
+                QUIZ_PHOTO_URI + " TEXT," +
                 QUIZ_PROGRESS + " INTEGER," +
                 LAST_RESULT + " INTEGER DEFAULT -1," +
                 QUIZ_CREATED_AT + " INTEGER)";
@@ -43,7 +43,7 @@ public class QuizContract {
         public static final String QUESTION_TEXT = "question_text";
         public static final String QUESTION_TYPE = "question_type";
         public static final String QUESTION_ORDER = "question_order";
-        public static final String QUESTION_PHOTO_BLOB = "question_photo_blob";
+        public static final String QUESTION_PHOTO_URI = "question_photo_uri";
 
         public static final String CREATE = "CREATE TABLE " + TABLE_NAME + "(" +
                 ID_QUESTION + " INTEGER PRIMARY KEY," +
@@ -51,7 +51,7 @@ public class QuizContract {
                 QUESTION_TEXT + " TEXT," +
                 QUESTION_TYPE + " TEXT," +
                 QUESTION_ORDER + " INTEGER," +
-                QUESTION_PHOTO_BLOB + " BLOB)";
+                QUESTION_PHOTO_URI + " TEXT)";
         public static final String DELETE = "DROP TABLE IF EXISTS " + TABLE_NAME;
     }
 
@@ -60,7 +60,7 @@ public class QuizContract {
         public static final String ID_ANSWER = "id_answer";
         public static final String QUESTION_ID = "question_id";
         public static final String ANSWER_TEXT = "answer_text";
-        public static final String ANSWER_IMAGE_BLOB = "answer_image_blob";
+        public static final String ANSWER_IMAGE_URI = "answer_image_uri";
         public static final String ANSWER_ORDER = "answer_order";
         public static final String IS_CORRECT = "is_correct";
 
@@ -68,7 +68,7 @@ public class QuizContract {
                 ID_ANSWER + " INTEGER PRIMARY KEY," +
                 QUESTION_ID + " INTEGER," +
                 ANSWER_TEXT + " TEXT," +
-                ANSWER_IMAGE_BLOB + " BLOB," +
+                ANSWER_IMAGE_URI + " TEXT," +
                 ANSWER_ORDER + " INTEGER," +
                 IS_CORRECT + " INTEGER)";
         public static final String DELETE = "DROP TABLE IF EXISTS " + TABLE_NAME;

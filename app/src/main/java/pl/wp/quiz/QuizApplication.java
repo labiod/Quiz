@@ -6,16 +6,15 @@ import android.os.Bundle;
 import java.lang.ref.WeakReference;
 
 /**
- * @author Krzysztof Betlej <k.betlej@samsung.com>.
+ * @author Krzysztof Betlej <labiod@wp.pl>.
  * @date 2/20/18
- * @copyright Copyright (c) 2016 by Samsung Electronics Polska Sp. z o. o.
  */
 
 public class QuizApplication extends Application {
     private WeakReference<OnDatabaseSynchronizedListener> mDatabaseSynchronizedListener;
     public interface OnDatabaseSynchronizedListener {
         void onDatabaseSynchronized();
-        void onDatabaseSyncProgress(int progress, Bundle args);
+        void onDatabaseSyncProgress(int progress);
     }
 
     public void registerOnDatabaseUpdateListener(OnDatabaseSynchronizedListener listener) {
@@ -32,12 +31,12 @@ public class QuizApplication extends Application {
         }
     }
 
-    public void databaseSyncProgress(int progress, Bundle args) {
+    public void databaseSyncProgress(int progress) {
 
         if (mDatabaseSynchronizedListener != null) {
             OnDatabaseSynchronizedListener listener = mDatabaseSynchronizedListener.get();
             if (listener != null) {
-                listener.onDatabaseSyncProgress(progress, args);
+                listener.onDatabaseSyncProgress(progress);
             }
         }
     }

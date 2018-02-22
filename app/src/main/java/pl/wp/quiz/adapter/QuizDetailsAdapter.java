@@ -1,6 +1,7 @@
 package pl.wp.quiz.adapter;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -14,6 +15,7 @@ import java.util.List;
 
 import pl.wp.quiz.R;
 import pl.wp.quiz.model.QuizModel;
+import pl.wp.quiz.synchronizer.ImageLoaderTask;
 
 public class QuizDetailsAdapter extends RecyclerView.Adapter<QuizDetailsAdapter.Holder> {
 
@@ -70,8 +72,15 @@ public class QuizDetailsAdapter extends RecyclerView.Adapter<QuizDetailsAdapter.
         });
         holder.quizTitle.setText(model.getQuizTitle());
         holder.quizInfo.setText(createInfoForQuiz(holder.quizImage.getContext(), model));
-        byte[] blob = model.getQuizImage();
-        holder.quizImage.setImageBitmap(BitmapFactory.decodeByteArray(blob, 0, blob.length));
+
+        ImageLoaderTask task = new ImageLoaderTask(new ImageLoaderTask.OnLoadTaskListener() {
+
+            @Override
+            public void onFinished(Bitmap bitmap) {
+                holder.quizImage.setImageBitmap(bitmap);
+            }
+        });
+        task.execute(model.getQuizImage());
     }
 
     @Override

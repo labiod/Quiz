@@ -7,25 +7,21 @@ import android.util.Log;
 
 import java.io.InputStream;
 
-public class ImageLoaderTask extends AsyncTask<ImageLoadItem, Void, Bitmap> {
+public class ImageLoaderTask extends AsyncTask<String, Void, Bitmap> {
     public interface OnLoadTaskListener {
         void onFinished(Bitmap bitmap);
     }
 
     private OnLoadTaskListener mListener;
 
-    public ImageLoaderTask() {
-    }
-
-    public void setOnLoadTaskListener(OnLoadTaskListener listener) {
+    public ImageLoaderTask(OnLoadTaskListener listener) {
         mListener = listener;
     }
 
 
     @Override
-    protected Bitmap doInBackground(ImageLoadItem... items) {
-        ImageLoadItem item = items[0];
-        String imageUrl = item.getUrl();
+    protected Bitmap doInBackground(String... items) {
+        String imageUrl = items[0];
         Bitmap result = null;
         try {
             InputStream in = new java.net.URL(imageUrl).openStream();

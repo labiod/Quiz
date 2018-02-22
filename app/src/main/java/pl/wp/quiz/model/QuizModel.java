@@ -21,7 +21,7 @@ public class QuizModel implements Parcelable {
     private int mQuestionNumber;
     private String mQuizTitle;
     private int mLastResultInfo;
-    private byte[] mQuizImageBytes;
+    private String mQuizImageURI;
     private String mQuizCategory;
     private long mCreatedDate;
     private long mId;
@@ -30,7 +30,7 @@ public class QuizModel implements Parcelable {
     public QuizModel(Cursor cursor) {
         mId = cursor.getLong(cursor.getColumnIndex(Quizzes.ID_QUIZ));
         mQuizTitle = cursor.getString(cursor.getColumnIndex(Quizzes.QUIZ_TITLE));
-        mQuizImageBytes = cursor.getBlob(cursor.getColumnIndex(Quizzes.QUIZ_PHOTO_BLOB));
+        mQuizImageURI = cursor.getString(cursor.getColumnIndex(Quizzes.QUIZ_PHOTO_URI));
         mQuestionNumber = cursor.getInt(cursor.getColumnIndex(Quizzes.QUESTION_NUMBER));
         mLastResultInfo = cursor.getInt(cursor.getColumnIndex(Quizzes.LAST_RESULT));
         mQuizCategory = cursor.getString(cursor.getColumnIndex(Quizzes.QUIZ_CATEGORY));
@@ -47,8 +47,8 @@ public class QuizModel implements Parcelable {
         mProgress = parcel.readInt();
     }
 
-    public byte[] getQuizImage() {
-        return mQuizImageBytes;
+    public String getQuizImage() {
+        return mQuizImageURI;
     }
 
     public int getLastResultInfo() {
