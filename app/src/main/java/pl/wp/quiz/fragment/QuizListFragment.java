@@ -78,7 +78,7 @@ public class QuizListFragment extends QuizBaseFragment implements QuizDetailsAda
     }
 
     @Override
-    public void onLoadData(Cursor cursor) {
+    public void onLoadData(Cursor cursor, int type) {
         List<QuizModel> quizModels = reteiveQuizzesForCursor(cursor);
         mQuizDetailsAdapter.setQuizzes(quizModels);
     }

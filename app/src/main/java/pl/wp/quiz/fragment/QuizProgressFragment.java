@@ -1,6 +1,5 @@
 package pl.wp.quiz.fragment;
 
-import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
@@ -44,7 +43,7 @@ public class QuizProgressFragment extends QuizBaseFragment {
     private long mQuizId;
 
     @Override
-    public void onLoadData(Cursor cursor) {
+    public void onLoadData(Cursor cursor, int type) {
         mQuestionList = retreiveQuestionsFromCursor(cursor);
         mQuizId = getArguments().getLong(QUIZ_ID);
         if (mProgress > 0) {
@@ -64,7 +63,7 @@ public class QuizProgressFragment extends QuizBaseFragment {
                 null,
                 QuizContract.UsersAnswers.ANSWER_DATE + " DESC");
         if (cursor != null) {
-            if (cursor.getColumnCount() > 0 && cursor.moveToFirst()) {
+            if (cursor.getCount() > 0 && cursor.moveToFirst()) {
                 result =  new UserAnswers(cursor);
             }
             cursor.close();

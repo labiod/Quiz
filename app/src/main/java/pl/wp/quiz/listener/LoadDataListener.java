@@ -7,5 +7,5 @@ import java.util.List;
  */
 
 public interface LoadDataListener<DataType> {
-    void onLoadData(DataType dataList);
+    void onLoadData(DataType dataList, int type);
 }

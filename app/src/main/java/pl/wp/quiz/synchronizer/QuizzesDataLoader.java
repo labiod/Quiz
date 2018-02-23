@@ -55,12 +55,13 @@ public class QuizzesDataLoader {
         @Override
         protected void onPostExecute(JSONObject jsonObject) {
             if (mListener != null) {
-                mListener.onLoadData(jsonObject);
+                mListener.onLoadData(jsonObject, SYNC_DATA);
             }
         }
     }
 
     public static final String TAG = QuizzesDataLoader.class.getSimpleName();
+    public static final int SYNC_DATA = 1;
 
     public static void loadData(final String entryPointUrl, LoadDataListener<JSONObject> listener) {
 

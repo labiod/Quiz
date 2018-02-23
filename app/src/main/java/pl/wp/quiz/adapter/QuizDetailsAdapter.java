@@ -1,11 +1,19 @@
 package pl.wp.quiz.adapter;
 
+import android.app.Activity;
+import android.app.LoaderManager;
 import android.content.Context;
+import android.content.CursorLoader;
+import android.content.Loader;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
+import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,22 +21,28 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import java.io.File;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
+import pl.wp.quiz.QuizActivity;
 import pl.wp.quiz.R;
 import pl.wp.quiz.model.QuizModel;
+import pl.wp.quiz.provider.database.ImageContract;
+import pl.wp.quiz.provider.database.QuizContract;
 import pl.wp.quiz.synchronizer.ImageLoaderTask;
 
 public class QuizDetailsAdapter extends RecyclerView.Adapter<QuizDetailsAdapter.Holder> {
 
     public static final String TAG = QuizDetailsAdapter.class.getSimpleName();
+    public static final int QUIZ_IMAGE_LOAD = 5;
 
     public interface OnItemClickListener {
         void onItemClick(int position);
     }
 
-    public class Holder extends RecyclerView.ViewHolder {
+    public class Holder extends RecyclerView.ViewHolder implements LoaderManager.LoaderCallbacks<Cursor> {
         TextView quizTitle;
         TextView quizInfo;
         ImageView quizImage;
@@ -45,20 +59,62 @@ public class QuizDetailsAdapter extends RecyclerView.Adapter<QuizDetailsAdapter.
             loadingProgress = itemView.findViewById(R.id.image_loading);
         }
 
-        public void startUploadImageTask(String imageUri) {
-            if (mTask != null && !mTask.isCancelled()) {
-                mTask.cancel(true);
+        public void startUploadImageTask(long quizId) {
+            Activity activity = (Activity) root.getContext();
+            Bundle args = new Bundle();
+            args.putLong(QuizActivity.QUIZ_ID, quizId);
+            if (activity.getLoaderManager().getLoader(QUIZ_IMAGE_LOAD) != null) {
+                activity.getLoaderManager().restartLoader(QUIZ_IMAGE_LOAD, args, this);
+            } else {
+                activity.getLoaderManager().initLoader(QUIZ_IMAGE_LOAD, args, this);
             }
-            mTask = new ImageLoaderTask(new ImageLoaderTask.OnLoadTaskListener() {
-                @Override
-                public void onFinished(Bitmap bitmap) {
-                    quizImage.setImageBitmap(bitmap);
+//            if (mTask != null && !mTask.isCancelled()) {
+//                mTask.cancel(true);
+//            }
+//            mTask = new ImageLoaderTask(new ImageLoaderTask.OnLoadTaskListener() {
+//                @Override
+//                public void onFinished(Bitmap bitmap) {
+//                    quizImage.setImageBitmap(bitmap);
+//                    quizImage.setVisibility(View.VISIBLE);
+//                    loadingProgress.setVisibility(View.INVISIBLE);
+//                }
+//            });
+//            mTask.execute(imageUri);
+        }
+
+        @Override
+        public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+            switch (id) {
+                case QUIZ_IMAGE_LOAD:
+                    Uri uri = Uri.withAppendedPath(ImageContract.CONTENT_URI,
+                            QuizContract.Quizzes.TABLE_NAME +
+                            "/" + args.getLong(QuizActivity.QUIZ_ID));
+                    return new CursorLoader(root.getContext(),
+                            uri,
+                            null,
+                            null,
+                            null,
+                            null);
+            }
+            return null;
+        }
+
+        @Override
+        public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+            if (data != null) {
+                if (data.getCount() > 0 && data.moveToFirst()) {
+                    String uri = data.getString(data.getColumnIndex(ImageContract.ImageEntry.IMAGE_URI));
+                    quizImage.setImageURI(Uri.parse(new File(uri).toString()));
                     quizImage.setVisibility(View.VISIBLE);
                     loadingProgress.setVisibility(View.INVISIBLE);
-
                 }
-            });
-            mTask.execute(imageUri);
+                data.close();
+            }
+        }
+
+        @Override
+        public void onLoaderReset(Loader<Cursor> loader) {
+            Log.d(TAG, "onLoaderReset: restart");
         }
     }
 
@@ -97,7 +153,7 @@ public class QuizDetailsAdapter extends RecyclerView.Adapter<QuizDetailsAdapter.
         holder.quizImage.setVisibility(View.GONE);
         holder.loadingProgress.setVisibility(View.VISIBLE);
         holder.quizInfo.setText(createInfoForQuiz(holder.quizImage.getContext(), model));
-        holder.startUploadImageTask(model.getQuizImage());
+        holder.startUploadImageTask(model.getId());
     }
 
     @Override

@@ -28,23 +28,27 @@ public class QuizDetailsFragment extends QuizBaseFragment {
     private TextView mAnserAtText;
 
     @Override
-    public void onLoadData(Cursor cursor) {
-        ((QuizActivity)getActivity()).hideLoadingScreen();
-        if (cursor != null) {
-            if (cursor.getCount() > 0 && cursor.moveToFirst()) {
-                int correctAnswer = getCorrectAnswer(cursor);
-                int questionNumber = cursor.getInt(cursor.getColumnIndex(QuizContract.Quizzes.QUESTION_NUMBER));
-                String rateText = cursor.getString(cursor.getColumnIndex(QuizContract.QuizRates.RATE_CONTENT));
-                mQuizRate.setText(rateText);
-                String pattern = mAnserAtText.getText().toString();
-                mAnserAtText.setText(String.format(pattern, correctAnswer));
-                if (questionNumber != 0) {
-                    String quizResult = String.valueOf(correctAnswer * 100 / questionNumber) + " %";
-                    mQuizResultView.setText(quizResult);
+    public void onLoadData(Cursor cursor, int type) {
+        switch (type) {
+            case QuizActivity.QUIZ_DETAILS_LOAD:
+                ((QuizActivity) getActivity()).hideLoadingScreen();
+                if (cursor != null) {
+                    if (cursor.getCount() > 0 && cursor.moveToFirst()) {
+                        int correctAnswer = getCorrectAnswer(cursor);
+                        int questionNumber = cursor.getInt(cursor.getColumnIndex(QuizContract.Quizzes.QUESTION_NUMBER));
+                        String rateText = cursor.getString(cursor.getColumnIndex(QuizContract.QuizRates.RATE_CONTENT));
+                        mQuizRate.setText(rateText);
+                        String pattern = mAnserAtText.getText().toString();
+                        mAnserAtText.setText(String.format(pattern, correctAnswer));
+                        if (questionNumber != 0) {
+                            String quizResult = String.valueOf(correctAnswer * 100 / questionNumber) + " %";
+                            mQuizResultView.setText(quizResult);
+                        }
+                        //float rate = cursor.getFloat(cursor.getColumnIndex("user_rates"));
+                    }
+                    cursor.close();
                 }
-                //float rate = cursor.getFloat(cursor.getColumnIndex("user_rates"));
-            }
-            cursor.close();
+                break;
         }
     }
 

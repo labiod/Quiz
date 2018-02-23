@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
-import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
 
@@ -15,9 +14,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
-import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.List;
 
 import pl.wp.quiz.QuizApplication;
 import pl.wp.quiz.listener.LoadDataListener;
@@ -35,8 +32,6 @@ public class SynchronizeService extends Service implements LoadDataListener<JSON
 
     public static final String SYNCHRONIZED = "synchronized";
     public static final String TAG = SynchronizeService.class.getSimpleName();
-    public static final String MESSAGE_INFO = "message";
-    public static final String MAX_PROGRESS = "max_progress";
     private final LinkedList<String> mLoadingQueqe = new LinkedList<>();
     private int mLoadProgress = 0;
 
@@ -63,7 +58,7 @@ public class SynchronizeService extends Service implements LoadDataListener<JSON
     }
 
     @Override
-    public void onLoadData(JSONObject quizzes) {
+    public void onLoadData(JSONObject quizzes, int type) {
         Log.d(TAG, "onLoadData: data loaded");
         try {
             int count = quizzes.getInt("count");
@@ -127,7 +122,7 @@ public class SynchronizeService extends Service implements LoadDataListener<JSON
             QuizzesDataLoader.loadData(mLoadingQueqe.removeFirst(),
                     new LoadDataListener<JSONObject>() {
                         @Override
-                        public void onLoadData(JSONObject dataList) {
+                        public void onLoadData(JSONObject dataList, int type) {
                             loadQuestionData(dataList);
                             loadFromQuequ(onQueueEndListener);
                             sendSyncInProgress(mLoadProgress++);

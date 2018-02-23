@@ -16,6 +16,7 @@ import org.w3c.dom.Text;
 import java.util.ArrayList;
 import java.util.List;
 
+import pl.wp.quiz.provider.database.ImageContract;
 import pl.wp.quiz.provider.database.QuizContract;
 
 /**
@@ -30,7 +31,9 @@ public class DataBaseTestActivity extends Activity {
             QuizContract.QuestionAnswers.TABLE_NAME,
             QuizContract.QuizRates.TABLE_NAME,
             QuizContract.UsersAnswers.TABLE_NAME,
-            QuizContract.QUESTION_WITH_ANSWER
+            QuizContract.QUESTION_WITH_ANSWER,
+            ImageContract.ImageEntry.TABLE_NAME,
+
     };
 
     private ArrayAdapter<String> mAdapter;
@@ -62,7 +65,12 @@ public class DataBaseTestActivity extends Activity {
     }
 
     private void loadData(String tableType, String selection) {
-        Uri uri = Uri.withAppendedPath(QuizContract.CONTENT_URI, tableType);
+        Uri uri;
+        if (tableType == ImageContract.ImageEntry.TABLE_NAME) {
+            uri = Uri.withAppendedPath(ImageContract.CONTENT_URI, QuizContract.Quizzes.TABLE_NAME);
+        } else {
+            uri = Uri.withAppendedPath(QuizContract.CONTENT_URI, tableType);
+        }
         Cursor cursor = getContentResolver().query(uri, null, selection, null, null);
         List<String> content = new ArrayList<>();
         if (cursor != null) {
@@ -73,7 +81,11 @@ public class DataBaseTestActivity extends Activity {
                         if (i != 0) {
                             builder.append(";");
                         }
-                        builder.append(cursor.getColumnName(i) + ": " + cursor.getString(i));
+                        if (cursor.getType(i) == Cursor.FIELD_TYPE_BLOB) {
+                            builder.append(cursor.getColumnName(i)).append(": BLOB");
+                        } else {
+                            builder.append(cursor.getColumnName(i)).append(": ").append(cursor.getString(i));
+                        }
                     }
                     content.add(builder.toString());
                 } while(cursor.moveToNext());

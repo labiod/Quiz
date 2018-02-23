@@ -22,6 +22,7 @@ public class QuizzesDBHelper extends SQLiteOpenHelper {
         db.execSQL(QuizContract.QuestionAnswers.CREATE);
         db.execSQL(QuizContract.UsersAnswers.CREATE);
         db.execSQL(QuizContract.QuizRates.CREATE);
+        db.execSQL(ImageContract.ImageEntry.CREATE);
     }
 
     @Override
@@ -32,6 +33,7 @@ public class QuizzesDBHelper extends SQLiteOpenHelper {
         db.execSQL(QuizContract.QuestionAnswers.DELETE);
         db.execSQL(QuizContract.UsersAnswers.DELETE);
         db.execSQL(QuizContract.QuizRates.DELETE);
+        db.execSQL(ImageContract.ImageEntry.DELETE);
         onCreate(db);
 
     }

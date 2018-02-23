@@ -24,6 +24,7 @@ import pl.wp.quiz.fragment.QuizListFragment;
 import pl.wp.quiz.fragment.QuizProgressFragment;
 import pl.wp.quiz.listener.LoadDataListener;
 import pl.wp.quiz.model.UserAnswers;
+import pl.wp.quiz.provider.database.ImageContract;
 import pl.wp.quiz.provider.database.QuizContract;
 import pl.wp.quiz.synchronizer.SyncDataReceiver;
 
@@ -34,13 +35,15 @@ public class QuizActivity extends AppCompatActivity implements LoaderManager.Loa
     public static final int QUIZZES_LOAD = 1;
     public static final int QUIZ_DETAILS_LOAD = 2;
     public static final int QUIZ_QUESTION_LOAD = 3;
-    private static final int CHECK_DATA = 4;
+    public static final int CHECK_DATA = 4;
+    public static final int QUIZ_IMAGE_LOAD = 5;
     public static final String Q_PROGRESS = "quiz_progress";
 
     public static final String QUIZ_LIST_FRAGMENT_TAG = "quiz_list_fragment_tag";
     public static final String QUIZ_DETAILS_FRAGMENT_TAG = "quiz_details_fragment_tag";
     public static final String QUIZ_PROGRESS_FRAGMENT_TAG = "quiz_progress_fragment_tag";
     public static final String USER_ANSWERS = "user_answers";
+    public static final String QUERY_SELECTION = "query_selection";
 
     private QuizBaseFragment mCurrentFragment;
     private final Handler mHandler = new Handler();
@@ -68,10 +71,14 @@ public class QuizActivity extends AppCompatActivity implements LoaderManager.Loa
     }
 
     public void loadQuizzes(int loaderId, Bundle args) {
+        loadQuizzes(loaderId, args, this);
+    }
+
+    public void loadQuizzes(int loaderId, Bundle args, LoaderManager.LoaderCallbacks<Cursor> callbacks) {
         if (getLoaderManager().getLoader(loaderId) == null) {
-            getLoaderManager().initLoader(loaderId, args, this);
+            getLoaderManager().initLoader(loaderId, args, callbacks);
         } else {
-            getLoaderManager().restartLoader(loaderId, args, this);
+            getLoaderManager().restartLoader(loaderId, args, callbacks);
         }
     }
 
@@ -139,7 +146,16 @@ public class QuizActivity extends AppCompatActivity implements LoaderManager.Loa
                         null, qSelect,
                         null,
                         QuizContract.QuizQuestions.QUESTION_ORDER + " COLLATE LOCALIZED ASC");
-
+            case QUIZ_IMAGE_LOAD:
+                String selection = args.getString(QUERY_SELECTION);
+                long quiz_id = args.getLong(QUIZ_ID);
+                Uri imageUri = Uri.withAppendedPath(ImageContract.CONTENT_URI, "quizzes" + "/" + quiz_id);
+                return new CursorLoader(this,
+                        imageUri,
+                        null,
+                        null,
+                        null,
+                        null);
         }
         return null;
     }
@@ -152,9 +168,9 @@ public class QuizActivity extends AppCompatActivity implements LoaderManager.Loa
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         if (mCurrentFragment != null) {
-            mCurrentFragment.onLoadData(data);
+            mCurrentFragment.onLoadData(data, loader.getId());
         } else {
-            onLoadData(data);
+            onLoadData(data, loader.getId());
         }
     }
 
@@ -194,7 +210,7 @@ public class QuizActivity extends AppCompatActivity implements LoaderManager.Loa
     }
 
     @Override
-    public void onLoadData(Cursor dataList) {
+    public void onLoadData(Cursor dataList, int type) {
         if (dataList == null || dataList.getCount() == 0) {
             SyncDataReceiver.startDataSynchronize(this, this);
         } else {

@@ -14,13 +14,17 @@ public class ImageContract {
 
     public static class ImageEntry {
         public static final String TABLE_NAME = "images";
-        public static final String ID = "image_url";
+        public static final String ID = "id_image";
+        public static final String IMAGE_TYPE = "image_type";
+        public static final String TYPE_ID = "type_id";
         public static final String IMAGE_URL = "image_url";
         public static final String IMAGE_URI = "image_uri";
         public static final String SYNC_DATE = "sync_date";
 
         public static final String CREATE = "CREATE TABLE " + TABLE_NAME + "(" +
                 ID + " INTEGER PRIMARY KEY," +
+                IMAGE_TYPE + " TEXT," +
+                TYPE_ID + " INTEGER," +
                 IMAGE_URI + " TEXT," +
                 IMAGE_URL + " TEXT," +
                 SYNC_DATE + " INTEGER)";

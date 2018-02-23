@@ -65,7 +65,7 @@ public class QuizProvider extends ContentProvider {
                         null
                 );
                 if (cursor != null) {
-                    if (cursor.getColumnCount() > 0 && cursor.moveToFirst()) {
+                    if (cursor.getCount() > 0 && cursor.moveToFirst()) {
                         do {
                             int from = cursor.getInt(cursor.getColumnIndex(QuizContract.QuizRates.RATE_FROM));
                             int to = cursor.getInt(cursor.getColumnIndex(QuizContract.QuizRates.RATE_TO));
@@ -167,7 +167,7 @@ public class QuizProvider extends ContentProvider {
                         null
                         );
                 if (cursor != null) {
-                    if (cursor.getColumnCount() > 0 && cursor.moveToFirst()) {
+                    if (cursor.getCount() > 0 && cursor.moveToFirst()) {
                         do {
                             int from = cursor.getInt(cursor.getColumnIndex(QuizContract.QuizRates.RATE_FROM));
                             int to = cursor.getInt(cursor.getColumnIndex(QuizContract.QuizRates.RATE_FROM));
