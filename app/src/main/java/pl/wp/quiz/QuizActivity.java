@@ -1,7 +1,5 @@
 package pl.wp.quiz;
 
-import android.app.Activity;
-import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.LoaderManager;
 import android.content.ContentValues;
@@ -12,14 +10,13 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v4.app.FragmentActivity;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.support.v7.app.AppCompatActivity;
 
 import pl.wp.quiz.fragment.QuizBaseFragment;
 import pl.wp.quiz.fragment.QuizDetailsFragment;
@@ -29,9 +26,8 @@ import pl.wp.quiz.listener.LoadDataListener;
 import pl.wp.quiz.model.UserAnswers;
 import pl.wp.quiz.provider.database.QuizContract;
 import pl.wp.quiz.synchronizer.SyncDataReceiver;
-import pl.wp.quiz.synchronizer.SynchronizeService;
 
-public class QuizActivity extends FragmentActivity implements LoaderManager.LoaderCallbacks<Cursor>,
+public class QuizActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>,
         QuizApplication.OnDatabaseSynchronizedListener, LoadDataListener<Cursor> {
 
     public static final String QUIZ_ID = "quiz_id";
