@@ -16,6 +16,7 @@ public class QuizContract {
         public static final String QUIZ_TYPE = "quiz_type";
         public static final String QUIZ_CATEGORY = "quiz_category";
         public static final String QUIZ_CONTENT = "quiz_content";
+        public static final String QUIZ_PHOTO_URL = "quiz_photo_url";
         public static final String QUIZ_PHOTO_URI = "quiz_photo_uri";
         public static final String QUIZ_PROGRESS = "quiz_progress";
         public static final String LAST_RESULT = "last_result";
@@ -28,6 +29,7 @@ public class QuizContract {
                 QUIZ_TYPE + " TEXT," +
                 QUIZ_CATEGORY + " TEXT," +
                 QUIZ_CONTENT + " TEXT," +
+                QUIZ_PHOTO_URL + " TEXT," +
                 QUIZ_PHOTO_URI + " TEXT," +
                 QUIZ_PROGRESS + " INTEGER," +
                 LAST_RESULT + " INTEGER DEFAULT -1," +

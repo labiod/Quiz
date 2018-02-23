@@ -8,12 +8,14 @@ import android.content.Loader;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Point;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,6 +28,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.reactivex.Observable;
 import pl.wp.quiz.QuizActivity;
 import pl.wp.quiz.R;
 import pl.wp.quiz.model.QuizModel;
@@ -104,12 +107,33 @@ public class QuizDetailsAdapter extends RecyclerView.Adapter<QuizDetailsAdapter.
             if (data != null) {
                 if (data.getCount() > 0 && data.moveToFirst()) {
                     String uri = data.getString(data.getColumnIndex(ImageContract.ImageEntry.IMAGE_URI));
-                    quizImage.setImageURI(Uri.parse(new File(uri).toString()));
+                    setBitmapFromURI(uri);
                     quizImage.setVisibility(View.VISIBLE);
                     loadingProgress.setVisibility(View.INVISIBLE);
                 }
                 data.close();
             }
+        }
+
+        private void setBitmapFromURI(String uri) {
+            Bitmap prevBitmap = quizImage.getDrawable() != null && quizImage.getDrawable() instanceof BitmapDrawable ?
+                    ((BitmapDrawable)quizImage.getDrawable()).getBitmap() : null;
+            if (prevBitmap != null) {
+                prevBitmap.recycle();
+            }
+
+            BitmapFactory.Options bounds = new BitmapFactory.Options();
+            bounds.inJustDecodeBounds = true;
+            BitmapFactory.decodeFile(uri, bounds);
+            Display display = ((Activity)quizImage.getContext()).getWindowManager().getDefaultDisplay();
+            Point size = new Point();
+            display.getSize(size);
+            int sampleRate = size.x < bounds.outWidth ? bounds.outWidth / size.x : 1;
+            Log.d(TAG, "setBitmapFromURI: width:" + bounds.outWidth);
+            Log.d(TAG, "setBitmapFromURI: height:" + bounds.outHeight);
+            BitmapFactory.Options option = new BitmapFactory.Options();
+            option.inSampleSize = sampleRate;
+            quizImage.setImageBitmap(BitmapFactory.decodeFile(uri, option));
         }
 
         @Override
@@ -150,10 +174,15 @@ public class QuizDetailsAdapter extends RecyclerView.Adapter<QuizDetailsAdapter.
             }
         });
         holder.quizTitle.setText(model.getQuizTitle());
-        holder.quizImage.setVisibility(View.GONE);
-        holder.loadingProgress.setVisibility(View.VISIBLE);
+        if (model.getQuizImageURI() != null) {
+            holder.loadingProgress.setVisibility(View.INVISIBLE);
+            holder.setBitmapFromURI(model.getQuizImageURI());
+        } else {
+            holder.quizImage.setVisibility(View.GONE);
+            holder.loadingProgress.setVisibility(View.VISIBLE);
+            holder.startUploadImageTask(model.getId());
+        }
         holder.quizInfo.setText(createInfoForQuiz(holder.quizImage.getContext(), model));
-        holder.startUploadImageTask(model.getId());
     }
 
     @Override

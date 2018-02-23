@@ -87,30 +87,35 @@ public class ImageDataProvider extends ContentProvider {
                     }
                     Cursor quizData = mDbHelper.getReadableDatabase().query(
                             QuizContract.Quizzes.TABLE_NAME,
-                            new String[] {QuizContract.Quizzes.QUIZ_PHOTO_URI},
+                            new String[] {QuizContract.Quizzes.QUIZ_PHOTO_URL},
                             QuizContract.Quizzes.ID_QUIZ + " = " + quizId,
                             null,
                             null,
                             null,
                             null
                     );
-                    ContentValues values = new ContentValues();
-                    values.put(ImageEntry.IMAGE_TYPE, QuizContract.Quizzes.TABLE_NAME);
-                    values.put(ImageEntry.TYPE_ID, quizId);
 
                     if (quizData != null) {
                         if (quizData.getCount() == 1 && quizData.moveToFirst()) {
-                            String imageURL = quizData.getString(quizData.getColumnIndex(QuizContract.Quizzes.QUIZ_PHOTO_URI));
+                            String imageURL = quizData.getString(quizData.getColumnIndex(QuizContract.Quizzes.QUIZ_PHOTO_URL));
                             String imageUri = loadImageFromUrl(imageURL, quizId, QuizContract.Quizzes.TABLE_NAME);
+                            ContentValues values = new ContentValues();
+                            values.put(ImageEntry.IMAGE_TYPE, QuizContract.Quizzes.TABLE_NAME);
+                            values.put(ImageEntry.TYPE_ID, quizId);
                             values.put(ImageEntry.IMAGE_URI, imageUri);
                             values.put(ImageEntry.IMAGE_URL, imageURL);
+                            mDbHelper.getWritableDatabase().insert(
+                                    ImageEntry.TABLE_NAME,
+                                    null,
+                                    values);
+                            ContentValues quizUpdate = new ContentValues();
+                            quizUpdate.put(QuizContract.Quizzes.QUIZ_PHOTO_URI, imageUri);
+                            mDbHelper.getWritableDatabase().update(QuizContract.Quizzes.TABLE_NAME,
+                                    quizUpdate, QuizContract.Quizzes.ID_QUIZ + " = " + quizId, null);
                         }
                         quizData.close();
                     }
-                    mDbHelper.getWritableDatabase().insert(
-                            ImageEntry.TABLE_NAME,
-                            null,
-                            values);
+
                     return mDbHelper.getReadableDatabase().query(
                             ImageEntry.TABLE_NAME,
                             projection,

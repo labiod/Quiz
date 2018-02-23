@@ -47,7 +47,7 @@ public class QuizModel implements Parcelable {
         mProgress = parcel.readInt();
     }
 
-    public String getQuizImage() {
+    public String getQuizImageURI() {
         return mQuizImageURI;
     }
 

@@ -73,7 +73,7 @@ public class SynchronizeService extends Service implements LoadDataListener<JSON
                 quiz.put(Quizzes.QUIZ_CONTENT, item.getString("content"));
                 quiz.put(Quizzes.QUIZ_TYPE, item.getString("type"));
                 quiz.put(Quizzes.QUIZ_CATEGORY, item.getJSONObject("category").getString("name"));
-                quiz.put(Quizzes.QUIZ_PHOTO_URI, item.getJSONObject("mainPhoto").getString("url"));
+                quiz.put(Quizzes.QUIZ_PHOTO_URL, item.getJSONObject("mainPhoto").getString("url"));
                 quiz.put(Quizzes.QUIZ_PROGRESS, 0);
                 final long id = item.getLong("id");
                 Uri quizUri = Uri.withAppendedPath(CONTENT_URI, Quizzes.TABLE_NAME);
