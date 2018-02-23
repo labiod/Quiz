@@ -86,7 +86,7 @@ public class QuizContract {
         public static final String CREATE = "CREATE TABLE " + TABLE_NAME + "(" +
                 ID + " INTEGER PRIMARY KEY," +
                 QUIZ_ID + " INTEGER," +
-                ANSWERS_LIST + " INTEGER," +
+                ANSWERS_LIST + " TEXT," +
                 ANSWER_PROGRESS + " INTEGER," +
                 RATE_ID + " INTEGER," +
                 ANSWER_DATE + " INTEGER)";
