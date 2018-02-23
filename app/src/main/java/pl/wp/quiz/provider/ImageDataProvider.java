@@ -7,11 +7,15 @@ import android.content.UriMatcher;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Point;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
+import android.view.Display;
+import android.view.WindowManager;
 
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -135,13 +139,24 @@ public class ImageDataProvider extends ContentProvider {
         File imageDir = getContext().getDir("images", Context.MODE_PRIVATE);
         File image = new File (imageDir, type + "_" + id + ".png");
         try {
-            InputStream in = new java.net.URL(imageUrl).openStream();
-            Bitmap bitmap = BitmapFactory.decodeStream(in);
+            InputStream in = new BufferedInputStream(new java.net.URL(imageUrl).openStream());
+            in.mark(in.available());
+            Display display = ((WindowManager)getContext().getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
+            Point size = new Point();
+            display.getSize(size);
+            BitmapFactory.Options bounds = new BitmapFactory.Options();
+            bounds.inJustDecodeBounds = true;
+            BitmapFactory.decodeStream(in, null, bounds);
+            int sampleRate = size.x < bounds.outWidth ? 1 + bounds.outWidth / size.x : 1;
+            bounds.inJustDecodeBounds = false;
+            bounds.inSampleSize = sampleRate;
+            in.reset();
 
+            Bitmap bitmap = BitmapFactory.decodeStream(in, null, bounds);
 
             fileOutputStream = new FileOutputStream(image);
 
-            bitmap.compress(Bitmap.CompressFormat.PNG, 80, fileOutputStream);
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, fileOutputStream);
             bitmap.recycle();
         } catch (Exception e) {
             Log.e("Error", e.getMessage());

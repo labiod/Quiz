@@ -128,7 +128,7 @@ public class QuizDetailsAdapter extends RecyclerView.Adapter<QuizDetailsAdapter.
             Display display = ((Activity)quizImage.getContext()).getWindowManager().getDefaultDisplay();
             Point size = new Point();
             display.getSize(size);
-            int sampleRate = size.x < bounds.outWidth ? bounds.outWidth / size.x : 1;
+            int sampleRate = size.x < bounds.outWidth ? 1 + bounds.outWidth / size.x : 1;
             Log.d(TAG, "setBitmapFromURI: width:" + bounds.outWidth);
             Log.d(TAG, "setBitmapFromURI: height:" + bounds.outHeight);
             BitmapFactory.Options option = new BitmapFactory.Options();
